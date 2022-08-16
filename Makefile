@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+         #
+#    By: dpuente- <dpuente-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 10:50:06 by rcabezas          #+#    #+#              #
-#    Updated: 2022/06/07 10:52:41 by rcabezas         ###   ########.fr        #
+#    Updated: 2022/07/18 16:32:35 by dpuente-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,17 +14,19 @@ NAME = webserv
 
 INC = -I includes
 
-CXX = clang++
+CXX = c++ --std=c++98
 
-CXXFLAGS = -Wall -Werror -Wextra -std=c++98 #-g3 -fsanitize=address
+CXXFLAGS = -Wall -Werror -Wextra -g3 -fsanitize=address
 
 SRCS = main.cpp
+SRCS_TEST = Tests/UnitTest.cpp
 
 OBJS = $(SRCS:.cpp=.o)
+OBJS_TEST = $(SRCS_TEST:.cpp=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME):	$(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 
 clean:
@@ -32,6 +34,9 @@ clean:
 
 fclean:	clean
 	rm -f $(NAME)
+
+test:	$(OBJS_TEST)
+	$(CXX) $(CXXFLAGS) $(OBJS_TEST) -o $(NAME)
 
 re:	fclean all
 
