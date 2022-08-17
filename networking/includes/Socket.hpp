@@ -1,18 +1,21 @@
 #pragma once
 
-#include "webserv.hpp"
+#include "../../webserv.hpp"
 
 namespace	ws
 {
-	class Socket
+	class	Socket
 	{
 		private:
-			struct sockaddr_in	address;
-			int					sock;
-			int					conn;
+			struct sockaddr_in	_address;
+			std::string 		_name;
+			int					_sock;
 			
 		public:
-			Socket(int domain, int service_type, int protocol, int port, u_long interface);
+			Socket(std::string name, int domain, int service_type, int protocol,
+				int port, u_long interface);
 			virtual	~Socket(void);
-	};	
+
+			void	connecting(void);
+	};
 };

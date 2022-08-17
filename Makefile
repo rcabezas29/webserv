@@ -6,13 +6,13 @@
 #    By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 10:50:06 by rcabezas          #+#    #+#              #
-#    Updated: 2022/07/27 23:35:32 by rcabezas         ###   ########.fr        #
+#    Updated: 2022/08/17 12:34:12 by rcabezas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
 
-INC = -I webserv.hpp networking/includes
+INC = -I webserv.hpp networking/includes/
 
 CXX = clang++
 
