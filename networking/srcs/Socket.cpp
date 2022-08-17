@@ -14,11 +14,11 @@ ws::Socket::Socket(std::string name, int domain, int service_type, int protocol,
 		perror("In bind");
 		exit(1);
 	}
-    if (listen(this->_sock, 10) < 0)
-    {
-        perror("In listen");
-        exit(1);
-    }
+	if (listen(this->_sock, 10) < 0)
+	{
+		perror("In listen");
+		exit(1);
+	}
 }
 
 ws::Socket::~Socket(void) {
@@ -38,7 +38,7 @@ void	ws::Socket::connecting(void) {
 			perror("In accept");
 			exit(1);
 		}
-		read(accept_fd, buffer, 30000);
+		recv(accept_fd, buffer, 30000, 0);
 		printf("-- THIS IS CONNECTION BUFFER -- \n%s\n", buffer);
 		send(accept_fd, "hola", 4, 0);
 		printf("------------------Hello message sent-------------------\n");
