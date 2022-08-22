@@ -6,7 +6,7 @@
 /*   By: dpuente- <dpuente-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/07 18:54:09 by dpuente-          #+#    #+#             */
-/*   Updated: 2022/07/11 16:25:16 by dpuente-         ###   ########.fr       */
+/*   Updated: 2022/08/22 18:20:21 by dpuente-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <netdb.h>
 # include <arpa/inet.h>
 # include <netinet/in.h>
+# include <fstream>
 
 
 
