@@ -4,6 +4,7 @@ ws::Socket::Socket(std::string name, int domain, int service_type, int protocol,
 	this->_address.sin_family = domain;
 	this->_address.sin_port = htons(port);
 	this->_address.sin_addr.s_addr = htonl(interface);
+
 	if ((this->_sock = socket(domain, service_type, protocol)) == -1)
 	{
 		perror("Socket function error");
@@ -13,6 +14,11 @@ ws::Socket::Socket(std::string name, int domain, int service_type, int protocol,
 	{
 		perror("In bind");
 		exit(1);
+	}
+	int yes = 1;
+	if (setsockopt(this->_sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+			perror("In setsockopt");
+			exit(1);
 	}
 	if (listen(this->_sock, 10) < 0)
 	{
@@ -40,9 +46,14 @@ void	ws::Socket::connecting(void) {
 		}
 		recv(accept_fd, buffer, 30000, 0);
 		printf("-- THIS IS CONNECTION BUFFER -- \n%s\n", buffer);
-		send(accept_fd, "hola", 4, 0);
+		send(accept_fd, "HTTP/1.1 200 OK\r\n"
+						"Content-type: text/html\r\n"
+						"Content-length: 13\r\n"
+						"\r\n"
+						"<h1>hola</h1>"
+			, 77, 0);
 		printf("------------------Hello message sent-------------------\n");
-		close(accept_fd);
+		shutdown(accept_fd, 2);
 	}
 	return ;
 }
