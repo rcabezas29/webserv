@@ -6,25 +6,27 @@
 #    By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 10:50:06 by rcabezas          #+#    #+#              #
-#    Updated: 2022/08/17 12:34:12 by rcabezas         ###   ########.fr        #
+#    Updated: 2022/08/23 20:22:36 by rcabezas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
 
-INC = -I webserv.hpp networking/includes/
-
 CXX = clang++
 
-CXXFLAGS = -Wall -Werror -Wextra -std=c++98 #-g3 -fsanitize=address
+CXXFLAGS = -Wall -Werror -Wextra -I includes
 
-SRCS = main.cpp networking/srcs/Socket.cpp
+SRCS = srcs/webserv.cpp srcs/Socket.cpp srcs/parse.cpp srcs/lexer.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
+SRCS_TEST = Tests/UnitTest.cpp
+
+OBJS_TEST = $(SRCS_TEST:.cpp=.o)
+
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME):	$(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 
 clean:
@@ -32,6 +34,9 @@ clean:
 
 fclean:	clean
 	rm -f $(NAME)
+
+test:	$(OBJS_TEST)
+	$(CXX) $(CXXFLAGS) $(OBJS_TEST) -o $(NAME)
 
 re:	fclean all
 
