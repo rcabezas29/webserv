@@ -17,12 +17,13 @@ namespace	ws
 		private:
 			start_line							_sl;
 			std::map<std::string, std::string>	_headers;
+			std::string 						_host;
 
 		public:
 			request(void);
-			virtual	~request(void);
+			~request(void);
 
-			void	parse_header(void);
+			void	parse_header(std::string header);
 			void	parse_start_line(std::string start_line);
 	};
 }

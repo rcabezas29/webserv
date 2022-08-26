@@ -11,6 +11,8 @@ void	ws::server::parse_request(std::string request) {
 	{
 		if (it == request_lines.begin())
 			this->_req.parse_start_line(*it);
+		else
+			this->_req.parse_header(*it);
 	}
 }
 
