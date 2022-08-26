@@ -7,8 +7,8 @@ namespace	ws
 	struct status_line
 	{
 		std::string	http_version;
-		int			status_code;
 		std::string	reason_phrase;
+		short		status_code;
 	};
 	
 	class	response
@@ -17,6 +17,7 @@ namespace	ws
 			status_line	_sl;
 
 		public:
-
+			response(void);
+			~response(void);
 	};
 }

@@ -6,7 +6,7 @@
 #    By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 10:50:06 by rcabezas          #+#    #+#              #
-#    Updated: 2022/08/24 16:18:15 by rcabezas         ###   ########.fr        #
+#    Updated: 2022/08/26 11:32:38 by rcabezas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ CXX = clang++
 
 CXXFLAGS = -Wall -Werror -Wextra -I includes
 
-SRCS = srcs/webserv.cpp srcs/Socket.cpp srcs/parse.cpp srcs/lexer.cpp srcs/server.cpp
+SRCS = srcs/webserv.cpp srcs/Socket.cpp srcs/server.cpp srcs/request.cpp srcs/utils.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

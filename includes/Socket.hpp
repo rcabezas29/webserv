@@ -12,9 +12,9 @@ namespace	ws
 			
 		public:
 			Socket(int domain, int service_type, int protocol, int port, u_long interface);
-			virtual	~Socket(void);
+			~Socket(void);
 
 			int	get_fd(void) const;
 			struct sockaddr_in	*get_address(void) const;
 	};
-};
+}

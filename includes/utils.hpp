@@ -3,28 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dpuente- <dpuente-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/07 18:54:09 by dpuente-          #+#    #+#             */
-/*   Updated: 2022/08/22 18:20:21 by dpuente-         ###   ########.fr       */
+/*   Updated: 2022/08/26 11:31:29 by rcabezas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # pragma once
-# ifndef UTILS_HPP
-# define UTILS_HPP
 
-# include <cstring>
-# include <stdio.h>
-# include <iostream>
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <netdb.h>
-# include <arpa/inet.h>
-# include <netinet/in.h>
-# include <fstream>
+# include "webserv.hpp"
 
-
-
-
-# endif
+namespace	ws
+{
+	std::vector<std::string>	ft_split(const std::string &s, char seperator);	
+}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "webserv.hpp"
+#include "utils.hpp"
 
 namespace	ws
 {
@@ -22,6 +23,6 @@ namespace	ws
 			virtual	~request(void);
 
 			void	parse_header(void);
-			void	parse_start_line(void);
+			void	parse_start_line(std::string start_line);
 	};
 }

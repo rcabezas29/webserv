@@ -1,8 +1,19 @@
 #include "server.hpp"
 
-ws::server::server(void) : _sock(AF_INET, SOCK_STREAM, 0, 4242, INADDR_ANY) {}
+ws::server::server(void) : _sock(AF_INET, SOCK_STREAM, 0, 4242, INADDR_ANY), _name("Server") {}
 
 ws::server::~server(void) {}
+
+void	ws::server::parse_request(std::string request) {
+	std::vector<std::string>	request_lines = ws::ft_split(request, '\n');
+
+	for (std::vector<std::string>::iterator it = request_lines.begin(); it != request_lines.end(); ++it)
+	{
+		if ((*it).find("HTTP"))
+			this->_req.parse_start_line(*it);
+
+	}
+}
 
 void	ws::server::connecting(void) {
 	int accept_fd = 0;
@@ -18,6 +29,7 @@ void	ws::server::connecting(void) {
 			exit(1);
 		}
 		recv(accept_fd, buffer, 30000, 0);
+		this->parse_request(buffer);
 		printf("-- THIS IS CONNECTION BUFFER -- \n%s\n", buffer);
 		send(accept_fd, "HTTP/1.1 200 OK\r\n"
 						"Content-type: text/html\r\n"
