@@ -1,6 +1,7 @@
 #include "Socket.hpp"
 
 ws::Socket::Socket(int domain, int service_type, int protocol, int port, u_long interface) {
+	this->_address = new sockaddr_in();
 	this->_address->sin_family = domain;
 	this->_address->sin_port = htons(port);
 	this->_address->sin_addr.s_addr = htonl(interface);
