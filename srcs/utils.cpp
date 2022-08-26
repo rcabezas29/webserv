@@ -1,6 +1,6 @@
 #include "utils.hpp"
 
-std::vector<std::string>	ws::ft_split(const std::string &s, char seperator)
+std::vector<std::string>	ws::ft_split(const std::string &s, std::string seperator)
 {
 	std::vector<std::string>	output;
 	std::string::size_type		prev_pos = 0, pos = 0;
