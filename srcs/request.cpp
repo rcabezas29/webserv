@@ -16,3 +16,5 @@ void	ws::request::parse_header(std::string header) {
 	if (header.substr(0, header.find(' ')) == "Host:")
 		this->_host = header.substr(6, header.size());
 }
+
+ws::start_line	ws::request::get_start_line(void) const { return this->_sl; }

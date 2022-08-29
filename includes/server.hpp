@@ -21,6 +21,6 @@ namespace	ws
 
 			void	connecting(void);
 			void	parse_request(std::string request);
-			char	*create_response(void) const;
+			std::string	create_response(void) const;
 	};
 }

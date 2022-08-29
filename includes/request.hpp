@@ -23,6 +23,8 @@ namespace	ws
 			request(void);
 			~request(void);
 
+			start_line	get_start_line(void) const;
+
 			void	parse_header(std::string header);
 			void	parse_start_line(std::string start_line);
 	};

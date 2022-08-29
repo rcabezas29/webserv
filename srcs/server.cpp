@@ -32,21 +32,20 @@ void	ws::server::connecting(void) {
 		recv(accept_fd, buffer, 30000, 0);
 		printf("-- THIS IS CONNECTION BUFFER -- \n%s\n", buffer);
 		this->parse_request(buffer);
-		this->create_response();
-		send(accept_fd, "HTTP/1.1 200 OK\r\n"
-						"Content-type: text/html\r\n"
-						"Content-length: 13\r\n"
-						"\r\n"
-						"<h1>hola</h1>"
-			, 77, 0);
+		std::string res = this->create_response();
+		send(accept_fd, res.c_str(), res.length(), 0);
 		printf("---------------Hello message sent----------------\n");
 		shutdown(accept_fd, 2);
 	}
 	return ;
 }
 
-char	*ws::server::create_response(void) const {
+std::string	ws::server::create_response(void) const {
 	response	res;
+	short		st_code = 200;
 
-	res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
+	// open file to read and add to response as text
+	res.set_status_line((status_line){this->_req.get_start_line().http_version, "OK", st_code});
+	res.set_body("<h1>hola</h1>");
+	return res.response_to_text();
 }

@@ -15,11 +15,15 @@ namespace	ws
 	{
 		private:
 			status_line	_sl;
+			std::string	_body;
 
 		public:
 			response(void);
 			~response(void);
 
-			void	set_status_line(status_line stat);
+			void		set_status_line(status_line stat);
+			void		set_body(std::string b);
+
+			std::string	response_to_text(void) const;
 	};
 }
