@@ -32,6 +32,7 @@ void	ws::server::connecting(void) {
 		recv(accept_fd, buffer, 30000, 0);
 		printf("-- THIS IS CONNECTION BUFFER -- \n%s\n", buffer);
 		this->parse_request(buffer);
+		this->create_response();
 		send(accept_fd, "HTTP/1.1 200 OK\r\n"
 						"Content-type: text/html\r\n"
 						"Content-length: 13\r\n"
@@ -42,4 +43,10 @@ void	ws::server::connecting(void) {
 		shutdown(accept_fd, 2);
 	}
 	return ;
+}
+
+char	*ws::server::create_response(void) const {
+	response	res;
+
+	res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
 }

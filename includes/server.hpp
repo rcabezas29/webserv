@@ -3,6 +3,7 @@
 #include "webserv.hpp"
 #include "Socket.hpp"
 #include "request.hpp"
+#include "response.hpp"
 #include "utils.hpp"
 
 namespace	ws
@@ -20,5 +21,6 @@ namespace	ws
 
 			void	connecting(void);
 			void	parse_request(std::string request);
+			char	*create_response(void) const;
 	};
 }

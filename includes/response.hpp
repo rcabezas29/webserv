@@ -19,5 +19,7 @@ namespace	ws
 		public:
 			response(void);
 			~response(void);
+
+			void	set_status_line(status_line stat);
 	};
 }
