@@ -15,6 +15,8 @@ void	ws::request::parse_start_line(std::string start_line) {
 void	ws::request::parse_header(std::string header) {
 	if (header.substr(0, header.find(' ')) == "Host:")
 		this->_host = header.substr(6, header.size());
+	if (header.find(':') != std::string::npos)
+		this->_headers[header.substr(0, header.find(':'))] = header.substr(header.find(':') + 2);
 }
 
 ws::start_line	ws::request::get_start_line(void) const { return this->_sl; }
