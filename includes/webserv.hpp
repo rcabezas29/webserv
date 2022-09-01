@@ -6,7 +6,7 @@
 /*   By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/27 18:19:45 by rcabezas          #+#    #+#             */
-/*   Updated: 2022/08/17 12:36:14 by rcabezas         ###   ########.fr       */
+/*   Updated: 2022/08/26 11:22:01 by rcabezas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 #include <iostream>
 #include <string>
+#include <map>
+#include <vector>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
-
-#include "networking/includes/Socket.hpp"
