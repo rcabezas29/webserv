@@ -31,5 +31,9 @@
 *.out
 *.app
 
+# Trash
+.idea
+.vscode
+
 .DS_Store
 
