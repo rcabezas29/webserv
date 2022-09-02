@@ -2,19 +2,12 @@
 
 #include "webserv.hpp"
 
-struct limit_except
-{
-	std::list<std::string>							methods;
-	std::list<std::string>							allowed_dirs;
-	std::list<std::string>							deny_dirs;
-};
-
-struct location_cofig
+struct location_config
 {
 	std::string										path;
-	std::vector<limit_except>						limit_exceptions;
+	std::list<std::string>							accepted_methods;
 	bool											autoindex;
-	std::string										default_error_file;
+	std::string										index;
 	std::string										root;
 };
 
@@ -24,4 +17,6 @@ struct server_config
 	std::list<std::pair<std::string, std::string> >	cgi;
 	std::pair<std::list<int>, std::string>			error_page;
 	long											client_max_body_size;
+	short											listen;
+	std::vector<location_config>					locations;
 };
