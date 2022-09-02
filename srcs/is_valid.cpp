@@ -5,6 +5,23 @@
 // barras para paths
 // 
 
+bool check_paths(std::string path)
+{
+	size_t n;
+
+	n = 0;
+	if (path[n] != '/')
+	{
+		if (!(path[n] == '~' && path[n+1] == '/'))
+			return false;
+	}
+	while(n < path.size())
+		n++;
+	if (path[n-1] != '/')
+		return false;
+	return true;
+}
+
 bool check_spaces(std::string line)
 {
 	size_t 			n;
