@@ -2,9 +2,9 @@
 #include "server_config.hpp"
 #include "utils.hpp"
 
-location_config	parse_location(std::fstream *file, std::string path) {
+// location_config	parse_location(std::fstream *file, std::string path) {
 	
-}
+// }
 
 server_config	parse_server_config(std::fstream *file) {
 	std::string		line;
@@ -29,8 +29,8 @@ server_config	parse_server_config(std::fstream *file) {
 					config.error_page.first.push_back(std::stoi(*it));
 			}
 		}
-		else if (splitted_line[0] == "location")
-			config.locations.push_back();
+		// else if (splitted_line[0] == "location")
+			// config.locations.push_back();
 	}
 	return config;
 }
@@ -40,13 +40,21 @@ std::vector<server_config>	parse_config_file(char *file) {
 	std::string					line;
 	std::vector<server_config>	servers;
 
-	config_file.open(file, std::ifstream::in);
-
-	while (std::getline(config_file, line))
+	if (is_valid(file))
 	{
-		server_config	serv;
-		if (line == "server {")
-			serv = parse_server_config(&config_file);
+		config_file.open(file, std::ifstream::in);
+
+		while (std::getline(config_file, line))
+		{
+			server_config	serv;
+			if (line == "server {")
+				serv = parse_server_config(&config_file);
+		}
+		return servers;
 	}
-	return servers;
+	else{
+		//std::cout << "El archivo especificado no es valido o no existe" << std::endl; // TODO: cambiar por por excetion
+		throw (std::invalid_argument("El archivo especificado no es valido o no existe"));
+		return servers;
+	}
 }

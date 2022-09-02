@@ -7,8 +7,16 @@ int	main(int argc, char **argv)
 	std::vector<server_config>	config_servers;
 
 	if (argc != 2)
-		return 1;
-	config_servers = parse_config_file(argv[1]);
+		return -1; //lanzar excepcion de error
+	try
+	{
+		config_servers = parse_config_file(argv[1]);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
 	// ws::server	serv;
 	// serv.connecting();
 	return 0;

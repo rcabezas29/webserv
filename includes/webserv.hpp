@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dpuente- <dpuente-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/27 18:19:45 by rcabezas          #+#    #+#             */
-/*   Updated: 2022/09/02 11:30:32 by rcabezas         ###   ########.fr       */
+/*   Updated: 2022/09/02 16:43:19 by dpuente-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,4 +24,7 @@
 
 #include "server_config.hpp"
 
-std::vector<server_config>	parse_config_file(char *file);
+// config_file_parser.cpp
+std::vector<server_config>		parse_config_file(char *file);
+// is_valid.cpp
+bool							is_valid(char *file);
