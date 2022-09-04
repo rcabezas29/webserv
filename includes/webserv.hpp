@@ -6,7 +6,7 @@
 /*   By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/27 18:19:45 by rcabezas          #+#    #+#             */
-/*   Updated: 2022/09/02 11:30:32 by rcabezas         ###   ########.fr       */
+/*   Updated: 2022/09/04 11:09:30 by rcabezas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,10 @@
 #include <list>
 #include <vector>
 #include <map>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <poll.h>
+#include <netinet/in.h>
 
 #include "server_config.hpp"
 
