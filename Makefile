@@ -6,7 +6,7 @@
 #    By: dpuente- <dpuente-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 10:50:06 by rcabezas          #+#    #+#              #
-#    Updated: 2022/09/04 11:04:34 by dpuente-         ###   ########.fr        #
+#    Updated: 2022/09/04 12:06:06 by dpuente-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = webserv
 
 CXX = clang++
 
-CXXFLAGS = -Wall -Werror -Wextra -I includes -g3 -fsanitize=address
+CXXFLAGS = -Wall -Werror -Wextra -I includes -g3 #-fsanitize=address
 
 SRCS = srcs/webserv.cpp srcs/Socket.cpp srcs/server.cpp srcs/request.cpp \
 		srcs/utils.cpp srcs/response.cpp srcs/config_file_parser.cpp \
