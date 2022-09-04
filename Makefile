@@ -6,7 +6,7 @@
 #    By: dpuente- <dpuente-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 10:50:06 by rcabezas          #+#    #+#              #
-#    Updated: 2022/09/02 16:25:15 by dpuente-         ###   ########.fr        #
+#    Updated: 2022/09/04 11:04:34 by dpuente-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,6 +43,6 @@ test:	$(OBJS_TEST)
 re:	fclean all
 
 fast: re
-	./$(NAME) config/server_basic.conf
+	./$(NAME) config/webserv.conf
 
 .PHONY: all clean fclean re

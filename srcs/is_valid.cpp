@@ -2,8 +2,6 @@
 #include "server_config.hpp"
 #include "utils.hpp"
 
-// barras para paths
-// 
 
 bool check_paths(std::string path)
 {
@@ -36,9 +34,21 @@ bool check_spaces(std::string line)
 	{
 		if (line[n] == '\n')
 			return true;
-		return false;
+		while(n < line.size())
+		{
+			if (line[n] == ' ')
+			{
+				if (n < line.size() && n > 0 && (line[n-1] == ' ' || line[n+1] == ' ' ))
+					return true;
+			}
+			n++;
+		}
+		if ((n - 1) >= 0 && line[n-1] == ' ')
+			return true;
+		if (line == "\n")
+			std::cout << "ya ves" << std::endl;
 	}
-	return true;
+	return false;
 }
 
 bool check_semicolon(std::string line)
@@ -84,7 +94,6 @@ bool is_valid(char *file)
 			semicolon = true;
 		if (check_spaces(line))
 			spaces = true;
-		// std::cout << line << std::endl;
 	}
 	if(open || semicolon || spaces)
 		return false;

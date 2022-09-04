@@ -16,8 +16,8 @@ int	main(int argc, char **argv)
 	{
 		std::cerr << e.what() << '\n';
 	}
-	if (!check_paths("path/"))
-		std::cout << "no vale" << std::endl;
+	// if (!check_paths("/path/"))
+	// 	std::cout << "no vale" << std::endl;
 	
 	// ws::server	serv;
 	// serv.connecting();
