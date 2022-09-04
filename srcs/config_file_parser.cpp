@@ -7,7 +7,7 @@ location_config	parse_location(std::fstream *file, std::string path) {
 	std::string		line;
 
 	lc.path = path;
-	while (std::getline(*file, line) && line != "}")
+	while (std::getline(*file, line) && line != "    }")
 	{
 		line.resize(line.length() - 1);
 		std::vector<std::string>	splitted_line = ws::ft_split(line, " ");
@@ -71,13 +71,15 @@ std::vector<server_config>	parse_config_file(char *file) {
 
 		while (std::getline(config_file, line))
 		{
-			server_config	serv;
 			if (line == "server {")
-				serv = parse_server_config(&config_file);
+			{
+				servers.push_back(parse_server_config(&config_file));
+			}
+			return servers;
 		}
-		return servers;
 	}
-	else{
+	else
+	{
 		//std::cout << "El archivo especificado no es valido o no existe" << std::endl; // TODO: cambiar por por excetion
 		throw (std::invalid_argument("El archivo especificado no es valido o no existe"));
 		return servers;
