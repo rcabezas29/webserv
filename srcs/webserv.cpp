@@ -34,19 +34,17 @@ int	main(int argc, char **argv) {
 
 	while (true)
 	{
-		printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+		printf("\n+++++++ RUNNING ++++++++\n\n");
 
 		if (poll(pfds, cluster.size(), INT32_MAX) == -1) {
-            perror("poll");
-            exit(1);
-        }
-
+			perror("poll");
+			exit(1);
+		}
 		for (std::vector<ws::server>::size_type i = 0; i < cluster.size(); i++)
 		{
 			if (pfds[i].revents & POLLIN)
 				cluster[i].connecting();
-		}
-		
+		}	
 	}
 	return 0;
 }

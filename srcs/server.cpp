@@ -41,25 +41,32 @@ void	ws::server::connecting(void) {
 std::string	ws::server::create_response(void) const {
 
 	response	res;
-	short		st_code = 200;
 	std::string	text;
+	std::fstream	reading_file;
+	std::string		body;
+	std::string		line;
 
 	// open file to read and add to response as text
-	res.set_status_line((status_line){this->_req.get_start_line().http_version, "OK", st_code});
+	res.set_status_line((status_line){this->_req.get_start_line().http_version, "OK", 200});
 
 	for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
 	{
 		if ((*it).path == this->_req.get_start_line().request_target)
 		{
-			std::fstream	reading_file;
-			std::string		body;
-			std::string		line;
 
 			reading_file.open((*it).index, std::ifstream::in);
 
 			while (std::getline(reading_file, line))
 				text += line + "\n";
 		}
+	}
+	if (text.size() == 0)
+	{
+		res.set_status_line((status_line){this->_req.get_start_line().http_version, "Not Found", 404});
+		reading_file.open("html_files/page_not_found.html", std::ifstream::in);
+
+		while (std::getline(reading_file, line))
+				text += line + "\n";
 	}
 	res.set_body(text);
 	return res.response_to_text();
