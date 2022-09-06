@@ -21,9 +21,12 @@ namespace	ws
 			server(server_config conf);
 			~server(void);
 
-			void		connecting(void);
-			void		parse_request(std::string request);
-			std::string	create_response(void) const;
+			void			connecting(void);
+			void			parse_request(std::string request);
+			std::string		create_response(void) const;
+			short			open_response_file(std::fstream *body_file, location_config loc) const;
+			void			create_body_from_default_error_page(std::fstream *file, short st_code) const;
+			void			create_autoindex_file(std::fstream *file, std::string path) const;
 
 			Socket	get_socket(void) const;
 	};

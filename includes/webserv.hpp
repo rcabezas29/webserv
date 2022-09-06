@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dpuente- <dpuente-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/27 18:19:45 by rcabezas          #+#    #+#             */
-/*   Updated: 2022/09/04 12:40:20 by dpuente-         ###   ########.fr       */
+/*   Updated: 2022/09/06 12:59:51 by rcabezas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <map>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <dirent.h>
 #include <poll.h>
 #include <netinet/in.h>
 

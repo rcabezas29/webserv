@@ -26,6 +26,7 @@ int	main(int argc, char **argv) {
 	if (argc != 2)
 		return 1;
 	config_servers = parse_config_file(argv[1]);
+
 	add_servers_to_cluster(&cluster, config_servers);
 
 	pfds = new pollfd[cluster.size()];
@@ -44,7 +45,7 @@ int	main(int argc, char **argv) {
 		{
 			if (pfds[i].revents & POLLIN)
 				cluster[i].connecting();
-		}	
+		}
 	}
 	return 0;
 }
