@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dpuente- <dpuente-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/27 18:19:45 by rcabezas          #+#    #+#             */
-/*   Updated: 2022/08/26 11:22:01 by rcabezas         ###   ########.fr       */
+/*   Updated: 2022/09/04 12:40:20 by dpuente-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,19 @@
 
 #include <iostream>
 #include <string>
-#include <map>
+#include <fstream>
+#include <list>
 #include <vector>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include <map>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <poll.h>
+#include <netinet/in.h>
+
+#include "server_config.hpp"
+
+// config_file_parser.cpp
+std::vector<server_config>		parse_config_file(char *file);
+// is_valid.cpp
+bool							is_valid(char *file);
+bool 							check_paths(std::string path);
