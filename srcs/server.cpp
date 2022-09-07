@@ -49,6 +49,7 @@ std::string	ws::server::create_response(void) const {
 
 	for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
 	{
+		std::cout << "--> [" + (*it).path + "]" << std::endl;
 		if ((*it).path == this->_req.get_start_line().request_target)
 		{
 			std::fstream	reading_file;
