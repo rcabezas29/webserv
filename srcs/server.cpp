@@ -42,10 +42,17 @@ std::string	ws::server::create_response(void) const {
 	std::fstream	body_file;
 	short			st_code = 404;
 
-	for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
+
+	std::cout << this->_req.get_host().size() << std::endl;
+	if (this->_req.get_host().size() == 0)
+		st_code = 400;
+	else
 	{
-		if (it->path == this->_req.get_start_line().request_target)
-			st_code = open_response_file(&body_file, *it);
+		for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
+		{
+			if (it->path == this->_req.get_start_line().request_target)
+				st_code = open_response_file(&body_file, *it);
+		}
 	}
 
 	if (is_error_code(st_code))
@@ -84,7 +91,7 @@ void	ws::server::create_body_from_default_error_page(std::fstream *file, short s
 	}
 	if (st_code == 403)
 		file->open("html_files/403_forbidden.html");
-	else
+	else if (st_code == 404)
 		file->open("html_files/page_not_found.html");
 }
 

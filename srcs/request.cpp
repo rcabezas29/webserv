@@ -20,3 +20,5 @@ void	ws::request::parse_header(std::string header) {
 }
 
 ws::start_line	ws::request::get_start_line(void) const { return this->_sl; }
+
+std::string	ws::request::get_host(void) const { return this->_host; }
