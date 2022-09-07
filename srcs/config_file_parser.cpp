@@ -75,12 +75,11 @@ std::vector<server_config>	parse_config_file(char *file) {
 			{
 				servers.push_back(parse_server_config(&config_file));
 			}
-			return servers;
 		}
+		return servers;
 	}
 	else
 	{
-		//std::cout << "El archivo especificado no es valido o no existe" << std::endl; // TODO: cambiar por por excetion
 		throw (std::invalid_argument("El archivo especificado no es valido o no existe"));
 		return servers;
 	}
