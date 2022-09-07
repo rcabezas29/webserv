@@ -72,7 +72,6 @@ std::vector<server_config>	parse_config_file(char *file) {
 		while (std::getline(config_file, line))
 		{
 			if (line == "server {")
-			{
 				servers.push_back(parse_server_config(&config_file));
 			}
 		}
