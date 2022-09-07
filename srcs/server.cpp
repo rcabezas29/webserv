@@ -83,7 +83,7 @@ void	ws::server::create_body_from_default_error_page(std::fstream *file, short s
 			file->open(this->_conf.error_page.second.c_str());
 	}
 	if (st_code == 403)
-		file->open("html_file/403_forbidden.html");
+		file->open("html_files/403_forbidden.html");
 	else
 		file->open("html_files/page_not_found.html");
 }
