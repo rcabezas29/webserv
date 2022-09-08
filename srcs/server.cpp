@@ -42,8 +42,6 @@ std::string	ws::server::create_response(void) const {
 	std::fstream	body_file;
 	short			st_code = 404;
 
-
-	std::cout << this->_req.get_host().size() << std::endl;
 	if (this->_req.get_host().size() == 0)
 		st_code = 400;
 	else
@@ -61,6 +59,13 @@ std::string	ws::server::create_response(void) const {
 	res.set_status_line((status_line){this->_req.get_start_line().http_version, generate_reason_phrase(st_code), st_code});
 
 	res.set_body(file_to_text(body_file));
+
+	{
+		std::map<std::string, std::string>	h;
+
+		h["Content-Length"] = res.get_body().size();
+		res.set_headers(h);
+	}
 
 	return res.response_to_text();
 }
