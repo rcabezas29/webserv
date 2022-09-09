@@ -32,8 +32,7 @@ int	main(int argc, char **argv) {
 	pfds = new pollfd[cluster.size()];
 
 	add_fds_to_pollfd(pfds, cluster);
-
-	while (true)
+	try
 	{
 		printf("\n+++++++ RUNNING ++++++++\n\n");
 
@@ -43,9 +42,24 @@ int	main(int argc, char **argv) {
 		}
 		for (std::vector<ws::server>::size_type i = 0; i < cluster.size(); i++)
 		{
-			if (pfds[i].revents & POLLIN)
-				cluster[i].connecting();
+			printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+
+			if (poll(pfds, cluster.size(), INT32_MAX) == -1) {
+				perror("poll");
+				exit(1);
+			}
+
+			for (std::vector<ws::server>::size_type i = 0; i < cluster.size(); i++)
+			{
+				if (pfds[i].revents & POLLIN)
+					cluster[i].connecting();
+			}
+			
 		}
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
 	}
 	return 0;
 }

@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include "utils.hpp"
 
 ws::server::server(void) : _sock(AF_INET, SOCK_STREAM, 0, 4242, INADDR_ANY) {}
 
@@ -37,14 +38,59 @@ void	ws::server::connecting(void) {
 	return ;
 }
 
+bool	ws::server::is_absolute_path(std::string path) const
+{
+	std::vector<const location_config>::iterator tmp = this->_conf.locations.begin();
+	int 	path_len = path.length();
+	if (path_len > 1){
+		std::string 	f_path = "";
+		std::string		e_path = "";
+		bool			part = true;
+		int		n = 0;
+
+		while (n < path_len) {
+			if (path[n] == '/' && n != 0)
+				part = false;
+			if(part)
+				f_path = f_path + path[n];
+			else
+				e_path = e_path + path[n];
+			n++;
+		}
+		std::cout << "[+] " + f_path << std::endl;
+		for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
+		{
+			if (it->path == f_path)
+			{
+				if (f_path != "/") {
+					std::fstream file;
+
+					file.open((it->root + e_path).c_str());
+					if (!file.is_open())
+						this->_conf.locations.begin() = tmp;
+						return false;
+				}				
+				this->_conf.locations.begin() = tmp;
+				return false;
+			}
+		}
+	}
+	this->_conf.locations.begin() = tmp;
+	return true;
+}
+
 std::string	ws::server::create_response(void) const {
 	response		res;
 	std::fstream	body_file;
 	short			st_code = 404;
 
-	if (this->_req.get_host().size() == 0)
-		st_code = 400;
-	else
+
+	if (this->is_absolute_path(this->_req.get_start_line().request_target))
+	{
+		std::cout << "ES ABSOLUTO" << std::endl;
+		//TODO: add the rest of the condition
+	}
+	for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
 	{
 		for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
 		{
@@ -52,7 +98,6 @@ std::string	ws::server::create_response(void) const {
 				st_code = open_response_file(&body_file, *it);
 		}
 	}
-
 	if (is_error_code(st_code))
 		create_body_from_default_error_page(&body_file, st_code);
 
@@ -71,6 +116,7 @@ std::string	ws::server::create_response(void) const {
 }
 
 short		ws::server::open_response_file(std::fstream *body_file, location_config loc) const {
+	
 	if (check_if_dir(loc.root + "/" + loc.index))
 	{
 		if (loc.autoindex)

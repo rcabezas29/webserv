@@ -21,6 +21,7 @@ namespace	ws
 			server(server_config conf);
 			~server(void);
 
+			bool			is_absolute_path(std::string path) const;
 			void			connecting(void);
 			void			parse_request(std::string request);
 			std::string		create_response(void) const;
