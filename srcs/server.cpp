@@ -38,17 +38,28 @@ void	ws::server::connecting(void) {
 	return ;
 }
 
-bool	ws::server::is_absolute_path(std::string path) const
+std::string	ws::server::is_absolute_path(std::string path) const
 {
 	std::vector<const location_config>::iterator tmp = this->_conf.locations.begin();
 	int 	path_len = path.length();
+	std::cout << path << std::endl;
+	if (path == "/")
+	{
+		for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
+		{
+			if (it->path == "/")
+				return (it->root + "/" + it->index);
+		}
+		this->_conf.locations.begin() = tmp;
+	}	
 	if (path_len > 1){
 		std::string 	f_path = "";
 		std::string		e_path = "";
 		bool			part = true;
 		int		n = 0;
 
-		while (n < path_len) {
+		while (n < path_len)
+		{
 			if (path[n] == '/' && n != 0)
 				part = false;
 			if(part)
@@ -57,43 +68,53 @@ bool	ws::server::is_absolute_path(std::string path) const
 				e_path = e_path + path[n];
 			n++;
 		}
-		std::cout << "[+] " + f_path << std::endl;
 		for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
 		{
 			if (it->path == f_path)
 			{
 				if (f_path != "/") {
 					std::fstream file;
-
 					file.open((it->root + e_path).c_str());
 					if (!file.is_open())
-						this->_conf.locations.begin() = tmp;
-						return false;
+					{
+						std::cout << "hola" << std::endl;
+						//TODO: añadir condicion para saber si es un directorio
+						file.open((it->root + e_path + "/" + it->index).c_str());
+						std::cout << (it->root + e_path + "/" + it->index).c_str() << std::endl;
+						if (!file.is_open())
+						{
+							//TODO: añadir condicion para saber si es un directorio
+							this->_conf.locations.begin() = tmp;
+							return path;
+						}
+						else
+							return (it->root + e_path + "/" + it->index);
+					}
+					file.close();
 				}				
 				this->_conf.locations.begin() = tmp;
-				return false;
+				return (it->root + e_path + "/" + it->index);
 			}
 		}
 	}
 	this->_conf.locations.begin() = tmp;
-	return true;
+	return path;
 }
 
 std::string	ws::server::create_response(void) const {
 	response		res;
 	std::fstream	body_file;
 	short			st_code = 404;
+	std::string		path;
 
+	
+	path = this->is_absolute_path(this->_req.get_start_line().request_target);
 
-	if (this->is_absolute_path(this->_req.get_start_line().request_target))
-	{
-		std::cout << "ES ABSOLUTO" << std::endl;
-		//TODO: add the rest of the condition
-	}
+	std::cout << "[+]" + this->_req.get_start_line().request_target << std::endl;
 	for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
 	{
 		if (it->path == this->_req.get_start_line().request_target)
-			st_code = open_response_file(&body_file, *it);
+			st_code = open_response_file(&body_file, *it, path);
 	}
 	if (is_error_code(st_code))
 		create_body_from_default_error_page(&body_file, st_code);
@@ -105,19 +126,38 @@ std::string	ws::server::create_response(void) const {
 	return res.response_to_text();
 }
 
-short		ws::server::open_response_file(std::fstream *body_file, location_config loc) const {
+// short		ws::server::open_response_file(std::fstream *body_file, location_config loc) const {
 	
-	if (check_if_dir(loc.root + "/" + loc.index))
+// 	if (check_if_dir(loc.root + "/" + loc.index))
+// 	{
+// 		if (loc.autoindex)
+// 		{
+// 			create_autoindex_file(body_file, loc.root + "/" + loc.index);
+// 			return 200;
+// 		}
+// 		else
+// 			return 403;
+// 	}
+// 	body_file->open(loc.root + "/" + loc.index);
+// 	if (body_file->is_open())
+// 		return 200;
+// 	else
+// 		return 404;
+// }
+
+short		ws::server::open_response_file(std::fstream *body_file, location_config loc, std::string path) const 
+{	
+	if (check_if_dir(path))
 	{
 		if (loc.autoindex)
 		{
-			create_autoindex_file(body_file, loc.root + "/" + loc.index);
+			create_autoindex_file(body_file, path);
 			return 200;
 		}
 		else
 			return 403;
 	}
-	body_file->open(loc.root + "/" + loc.index);
+	body_file->open(path);
 	if (body_file->is_open())
 		return 200;
 	else

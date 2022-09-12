@@ -81,5 +81,6 @@ std::vector<server_config>	parse_config_file(char *file) {
 	{
 		throw (std::invalid_argument("El archivo especificado no es valido o no existe"));
 		exit(1);
+		// return servers;
 	}
 }
