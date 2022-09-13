@@ -77,15 +77,20 @@ std::string	ws::server::is_absolute_path(std::string path) const
 					file.open((it->root + e_path).c_str());
 					if (!file.is_open())
 					{
-						std::cout << "hola" << std::endl;
-						//TODO: añadir condicion para saber si es un directorio
+						if (check_if_dir(it->root + e_path))
+						{
+							return (it->root + e_path);
+						}
 						file.open((it->root + e_path + "/" + it->index).c_str());
 						std::cout << (it->root + e_path + "/" + it->index).c_str() << std::endl;
 						if (!file.is_open())
 						{
-							//TODO: añadir condicion para saber si es un directorio
+							if (check_if_dir(it->root + e_path + "/" + it->index))
+							{
+								return (it->root + e_path + "/" + it->index);
+							}
 							this->_conf.locations.begin() = tmp;
-							return path;
+							return it->root + e_path;
 						}
 						else
 							return (it->root + e_path + "/" + it->index);
@@ -97,7 +102,14 @@ std::string	ws::server::is_absolute_path(std::string path) const
 			}
 		}
 	}
-	this->_conf.locations.begin() = tmp;
+	for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
+	{
+		if (it->path == "/")
+		{
+			this->_conf.locations.begin() = tmp;
+			return (it->root + path);
+		}
+	}
 	return path;
 }
 
@@ -106,15 +118,28 @@ std::string	ws::server::create_response(void) const {
 	std::fstream	body_file;
 	short			st_code = 404;
 	std::string		path;
-
+	bool			absolute = false;
 	
 	path = this->is_absolute_path(this->_req.get_start_line().request_target);
 
-	std::cout << "[+]" + this->_req.get_start_line().request_target << std::endl;
 	for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
 	{
 		if (it->path == this->_req.get_start_line().request_target)
+		{
 			st_code = open_response_file(&body_file, *it, path);
+			absolute = true;
+		}
+	}
+	if (!absolute)
+	{
+		for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
+		{
+			if (it->path == "/")
+			{
+				st_code = open_response_file(&body_file, *it, path);
+				break;
+			}
+		}
 	}
 	if (is_error_code(st_code))
 		create_body_from_default_error_page(&body_file, st_code);
@@ -126,29 +151,11 @@ std::string	ws::server::create_response(void) const {
 	return res.response_to_text();
 }
 
-// short		ws::server::open_response_file(std::fstream *body_file, location_config loc) const {
-	
-// 	if (check_if_dir(loc.root + "/" + loc.index))
-// 	{
-// 		if (loc.autoindex)
-// 		{
-// 			create_autoindex_file(body_file, loc.root + "/" + loc.index);
-// 			return 200;
-// 		}
-// 		else
-// 			return 403;
-// 	}
-// 	body_file->open(loc.root + "/" + loc.index);
-// 	if (body_file->is_open())
-// 		return 200;
-// 	else
-// 		return 404;
-// }
-
 short		ws::server::open_response_file(std::fstream *body_file, location_config loc, std::string path) const 
 {	
 	if (check_if_dir(path))
 	{
+		std::cout << "SIP" << std::endl;
 		if (loc.autoindex)
 		{
 			create_autoindex_file(body_file, path);
