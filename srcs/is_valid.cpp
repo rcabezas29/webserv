@@ -70,32 +70,29 @@ bool check_semicolon(std::string line)
 	return true;
 }
 
-// bool	root_location(char *file)
-// {
-// 	std::fstream				config_file;
-// 	std::string					line;
-// 	int							servers;
+bool	root_location(char *file)
+{
+	std::fstream				config_file;
+	std::string					line;
+	int							servers;
 
-// 	servers = 0;
-// 	config_file.open(file, std::ifstream::in);
-// 	while (std::getline(config_file, line))
-// 	{
-// 		// std::cout << line << std::endl;
-// 		if (line.find("server {") != std::string::npos)
-// 			servers++;
-// 		if (line.find("location /"))
-// 		{
-// 			std::cout << line << std::endl;
-// 			if (servers != 1)
-// 				return true;
-// 			servers--;
-// 		}
-// 	}
-// 	std::cout << servers << std::endl;
-// 	// if (servers != 0)
-// 	// 	return true;
-// 	return false;
-// }
+	servers = 0;
+	config_file.open(file, std::ifstream::in);
+	while (std::getline(config_file, line))
+	{
+		if (line == "server {")
+			servers++;
+		if (line == "    location / {")
+		{
+			if (servers != 1)
+				return true;
+			servers--;
+		}
+	}
+	if (servers != 0)
+		return true;
+	return false;
+}
 
 bool	is_valid(char *file)
 {
@@ -122,8 +119,7 @@ bool	is_valid(char *file)
 		if (check_spaces(line))
 			spaces = true;
 	}
-	// if(open || semicolon || spaces || root_location(file))
-	if(open || semicolon || spaces)
+	if(open || semicolon || spaces || root_location(file))
 		return false;
 	return (true);
 }
