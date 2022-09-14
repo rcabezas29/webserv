@@ -45,8 +45,6 @@ bool check_spaces(std::string line)
 		}
 		if ((n - 1) >= 0 && line[n-1] == ' ')
 			return true;
-		if (line == "\n")
-			std::cout << "ya ves" << std::endl;
 	}
 	return false;
 }

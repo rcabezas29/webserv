@@ -28,6 +28,8 @@ namespace	ws
 			short			open_response_file(std::fstream *body_file, location_config loc, std::string path) const;
 			void			create_body_from_default_error_page(std::fstream *file, short st_code) const;
 			void			create_autoindex_file(std::fstream *file, std::string path) const;
+			
+			bool			check_if_cgi(std::string path) const;
 
 			Socket	get_socket(void) const;
 	};

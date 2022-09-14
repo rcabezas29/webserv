@@ -14,7 +14,7 @@ struct location_config
 struct server_config
 {
 	std::string										server_name;
-	std::list<std::pair<std::string, std::string> >	cgi;
+	std::map<std::string, std::string>				cgi;
 	std::pair<std::list<int>, std::string>			error_page;
 	long											client_max_body_size;
 	short											listen;
