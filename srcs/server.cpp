@@ -136,7 +136,7 @@ std::string	ws::server::create_response(void) const {
 			if (path.find(it->first, path.size() - it->first.size() - 1) != std::string::npos)
 			{
 				std::cout << "holi" << std::endl;
-				// cgi cgi(*it, this->_conf.server_name, this->_conf.listen);
+				// cgi cgi(*it, this->_conf.server_name, this->_conf.listen, this->_req.get_host());
 				// return cgi.response();
 			}
 		}

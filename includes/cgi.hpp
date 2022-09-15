@@ -27,11 +27,9 @@ namespace	ws
 			std::string			_file;
 
 		public:
-			cgi(std::pair<std::string, std::string> conf, std::string sever_name, short port);
+			cgi(std::pair<std::string, std::string> conf, std::string sever_name, short port, std::string file, std::string remote_host);
 			~cgi(void);
 
-
-
-			std::string	response(void) const;
+			std::string	response(void);
 	};
 }
