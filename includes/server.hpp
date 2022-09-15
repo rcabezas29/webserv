@@ -6,6 +6,7 @@
 #include "response.hpp"
 #include "utils.hpp"
 #include "server_config.hpp"
+#include "cgi.hpp"
 
 namespace	ws
 {
