@@ -2,6 +2,9 @@
 #include "stdlib.h"
 #include "limits.h"
 #include <sstream>
+#include <cstdlib>
+#include <fcntl.h>
+
 
 extern char **environ;
 
@@ -70,12 +73,16 @@ char	**ws::cgi::set_vars_into_env(void) const
 
 std::string	ws::cgi::response(void)
 {
-	char	**env = set_vars_into_env();
-	env = fusion_env_with_vars(env);
-	int	pid;
-	std::string	ret;
+	char		**env = set_vars_into_env();
+	char		tmp[FILENAME_MAX];
+	int			pid;
+	int			pipe_fd[2];
+	char		aux[4096];
 
-	char	tmp[FILENAME_MAX];
+	pipe(pipe_fd);
+
+	env = fusion_env_with_vars(env);
+
 	getcwd(tmp, FILENAME_MAX);
 
 	std::string	pwd(tmp);
@@ -85,10 +92,15 @@ std::string	ws::cgi::response(void)
 		perror("fork error");
 	else if (pid == 0)
 	{
+		dup2 (pipe_fd[1], STDOUT_FILENO);
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
 
 		if (execle(abs_path.c_str(), this->_program.c_str(), this->_file.c_str(), NULL, env) < 0)
-			std::cout << "No funca" << std::endl;
+			perror("execle");
 	}
-	
-	return ret;
+	close(pipe_fd[1]);
+	read(pipe_fd[0], aux, sizeof(aux));
+
+	return std::string(aux);
 }
