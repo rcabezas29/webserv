@@ -45,3 +45,10 @@ std::string					ws::file_to_text(std::fstream &file) {
 }
 
 bool						ws::check_if_dir(std::string path) { return (opendir(path.c_str())); }
+
+int							ws::matrix_length(char **m) {
+	int	i = 0;
+	while (m[i])
+		i++;
+	return i;
+}

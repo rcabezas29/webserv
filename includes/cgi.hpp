@@ -34,5 +34,6 @@ namespace	ws
 
 			std::string	response(void);
 			char		**set_vars_into_env(void) const;
+			char		**fusion_env_with_vars(char **vars) const;
 	};
 }

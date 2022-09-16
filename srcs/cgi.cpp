@@ -1,5 +1,7 @@
 #include "cgi.hpp"
 #include "stdlib.h"
+#include "limits.h"
+#include <sstream>
 
 extern char **environ;
 
@@ -19,6 +21,22 @@ ws::cgi::cgi(std::pair<std::string, std::string> conf, server_config serv, std::
 }
 
 ws::cgi::~cgi(void) {}
+
+char	**ws::cgi::fusion_env_with_vars(char **vars) const
+{
+	char	**ret = new char*[ws::matrix_length(vars) + ws::matrix_length(environ) + 1];
+	int		i = 0;
+
+	for (int j = 0; environ[j]; ++j)
+		ret[i++] = strdup(environ[j]);
+
+	for (int j = 0; vars[j]; ++j)
+		ret[i++] = vars[j];
+	ret[i] = NULL;
+
+	delete[] vars;
+	return ret;
+}
 
 char	**ws::cgi::set_vars_into_env(void) const
 {
@@ -46,16 +64,31 @@ char	**ws::cgi::set_vars_into_env(void) const
 	env[8] = strdup(str.c_str());
 	str = "SERVER_SOFTWARE=" + this->_cmv.server_software;
 	env[9] = strdup(str.c_str());
-	// env[10] = NULL;
+	env[10] = NULL;
 	return env;
 }
 
 std::string	ws::cgi::response(void)
 {
 	char	**env = set_vars_into_env();
+	env = fusion_env_with_vars(env);
+	int	pid;
+	std::string	ret;
 
-	if (execle(this->_program.c_str(), this->_file.c_str(), env) < 0)
-		std::cout << "No funca" << std::endl;
+	char	tmp[FILENAME_MAX];
+	getcwd(tmp, FILENAME_MAX);
 
-	return "cgi";
+	std::string	pwd(tmp);
+	std::string	abs_path = pwd + "/" + this->_program;
+
+	if ((pid = fork()) == -1)
+		perror("fork error");
+	else if (pid == 0)
+	{
+
+		if (execle(abs_path.c_str(), this->_program.c_str(), this->_file.c_str(), NULL, env) < 0)
+			std::cout << "No funca" << std::endl;
+	}
+	
+	return ret;
 }
