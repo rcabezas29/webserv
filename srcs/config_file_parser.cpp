@@ -55,7 +55,7 @@ server_config	parse_server_config(std::fstream *file) {
 		else if (splitted_line[0] == "location")
 			config.locations.push_back(parse_location(file, splitted_line[1]));
 		else if (splitted_line[0] == "cgi")
-			config.cgi.push_back(std::make_pair(splitted_line[1], splitted_line[2]));
+			config.cgi.insert(std::make_pair(splitted_line[1], splitted_line[2]));
 	}
 	return config;
 }
@@ -80,7 +80,5 @@ std::vector<server_config>	parse_config_file(char *file) {
 	else
 	{
 		throw (std::invalid_argument("El archivo especificado no es valido o no existe"));
-		exit(1);
-		// return servers;
 	}
 }

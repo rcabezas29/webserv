@@ -1,5 +1,4 @@
 #include "server.hpp"
-#include "utils.hpp"
 
 ws::server::server(void) : _sock(AF_INET, SOCK_STREAM, 0, 4242, INADDR_ANY) {}
 
@@ -42,7 +41,7 @@ std::string	ws::server::is_absolute_path(std::string path) const
 {
 	std::vector<const location_config>::iterator tmp = this->_conf.locations.begin();
 	int 	path_len = path.length();
-	std::cout << path << std::endl;
+
 	if (path == "/")
 	{
 		for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
@@ -82,7 +81,6 @@ std::string	ws::server::is_absolute_path(std::string path) const
 							return (it->root + e_path);
 						}
 						file.open((it->root + e_path + "/" + it->index).c_str());
-						std::cout << (it->root + e_path + "/" + it->index).c_str() << std::endl;
 						if (!file.is_open())
 						{
 							if (check_if_dir(it->root + e_path + "/" + it->index))
@@ -113,6 +111,15 @@ std::string	ws::server::is_absolute_path(std::string path) const
 	return path;
 }
 
+bool	ws::server::check_if_cgi(std::string path) const {
+	for (std::map<std::string, std::string>::const_iterator it = this->_conf.cgi.begin(); it != this->_conf.cgi.end(); ++it)
+	{
+		if (path.find(it->first, path.size() - it->first.size() - 1) != std::string::npos)
+			return true;
+	}
+	return false;
+}
+
 std::string	ws::server::create_response(void) const {
 	response		res;
 	std::fstream	body_file;
@@ -121,6 +128,18 @@ std::string	ws::server::create_response(void) const {
 	bool			absolute = false;
 	
 	path = this->is_absolute_path(this->_req.get_start_line().request_target);
+
+	if (check_if_cgi(path))
+	{
+		for (std::map<std::string, std::string>::const_iterator it = this->_conf.cgi.begin(); it != this->_conf.cgi.end(); ++it)
+		{
+			if (path.find(it->first, path.size() - it->first.size() - 1) != std::string::npos)
+			{
+				cgi bla(*it, this->_conf, path, this->_req);
+				return bla.create_response();
+			}
+		}
+	}
 
 	for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
 	{
@@ -137,7 +156,7 @@ std::string	ws::server::create_response(void) const {
 			if (it->path == "/")
 			{
 				st_code = open_response_file(&body_file, *it, path);
-				break;
+				break ;
 			}
 		}
 	}
@@ -148,14 +167,20 @@ std::string	ws::server::create_response(void) const {
 
 	res.set_body(file_to_text(body_file));
 
+	{
+		std::map<std::string, std::string>	h;
+
+		h["Content-Length"] = res.get_body().size();
+		res.set_headers(h);
+	}
+
 	return res.response_to_text();
 }
 
 short		ws::server::open_response_file(std::fstream *body_file, location_config loc, std::string path) const 
-{	
+{
 	if (check_if_dir(path))
 	{
-		std::cout << "SIP" << std::endl;
 		if (loc.autoindex)
 		{
 			create_autoindex_file(body_file, path);
@@ -179,7 +204,7 @@ void	ws::server::create_body_from_default_error_page(std::fstream *file, short s
 	}
 	if (st_code == 403)
 		file->open("html_files/403_forbidden.html");
-	else
+	else if (st_code == 404)
 		file->open("html_files/page_not_found.html");
 }
 

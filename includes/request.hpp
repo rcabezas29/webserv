@@ -24,6 +24,7 @@ namespace	ws
 			~request(void);
 
 			start_line	get_start_line(void) const;
+			std::string	get_host(void) const;
 
 			void	parse_header(std::string header);
 			void	parse_start_line(std::string start_line);

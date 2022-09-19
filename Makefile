@@ -18,7 +18,7 @@ CXXFLAGS = -Wall -Werror -Wextra -I includes -g3 -fsanitize=address
 
 SRCS = srcs/webserv.cpp srcs/Socket.cpp srcs/server.cpp srcs/request.cpp \
 		srcs/utils.cpp srcs/response.cpp srcs/config_file_parser.cpp \
-		srcs/is_valid.cpp
+		srcs/is_valid.cpp srcs/cgi.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
