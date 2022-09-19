@@ -136,7 +136,7 @@ std::string	ws::server::create_response(void) const {
 			if (path.find(it->first, path.size() - it->first.size() - 1) != std::string::npos)
 			{
 				cgi bla(*it, this->_conf, path, this->_req);
-				return bla.response();
+				return bla.create_response();
 			}
 		}
 	}

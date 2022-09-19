@@ -2,6 +2,7 @@
 
 #include "webserv.hpp"
 #include "request.hpp"
+#include "response.hpp"
 
 namespace	ws
 {
@@ -32,8 +33,9 @@ namespace	ws
 			cgi(std::pair<std::string, std::string> conf, server_config serv, std::string file, request req);
 			~cgi(void);
 
-			std::string	response(void);
+			std::string	create_response(void);
 			char		**set_vars_into_env(void) const;
 			char		**fusion_env_with_vars(char **vars) const;
+			response	response_from_cgi(char *cgi_text);
 	};
 }
