@@ -8,14 +8,21 @@ ws::server::~server(void) {}
 
 void	ws::server::parse_request(std::string request) {
 	std::vector<std::string>	request_lines = ws::ft_split(request, "\r\n");
+	std::vector<std::string>::iterator it = request_lines.begin();
+	std::string	body;
 
-	for (std::vector<std::string>::iterator it = request_lines.begin(); it != request_lines.end(); ++it)
+	while (*it != "")
 	{
 		if (it == request_lines.begin())
 			this->_req.parse_start_line(*it);
 		else
 			this->_req.parse_header(*it);
+		++it;
 	}
+	while (it++ != request_lines.end())
+		body += *it;
+
+	this->_req.set_body(body);
 }
 
 void	ws::server::connecting(void) {
@@ -29,7 +36,6 @@ void	ws::server::connecting(void) {
 		exit(1);
 	}
 	recv(accept_fd, buffer, 30000, 0);
-	printf("-- THIS IS CONNECTION BUFFER -- \n%s\n", buffer);
 	this->parse_request(buffer);
 	std::string res(this->create_response());
 	send(accept_fd, res.c_str(), res.length(), 0);
@@ -120,7 +126,40 @@ bool	ws::server::check_if_cgi(std::string path) const {
 	return false;
 }
 
-std::string	ws::server::create_response(void) const {
+std::string		ws::server::create_response(void) const
+{
+	std::string	res;
+
+	if (this->_req.get_start_line().method == "GET")
+		return create_response_get();
+	else if (this->_req.get_start_line().method == "POST")
+		return create_response_post();
+	else if (this->_req.get_start_line().method == "DELETE")
+		return create_response_delete();
+	else
+		return "";
+}
+
+std::string	ws::server::create_response_delete(void) const
+{
+	return "";
+}
+
+std::string	ws::server::create_response_post(void) const
+{
+	response	res;
+	std::ofstream file(this->_req.get_start_line().request_target.substr(1, std::string::npos), std::ios::out);
+
+	file << this->_req.get_body();
+
+	file.close();
+
+	res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
+	return res.response_to_text();
+}
+
+std::string	ws::server::create_response_get(void) const
+{
 	response		res;
 	std::fstream	body_file;
 	short			st_code = 404;
