@@ -70,7 +70,31 @@ bool check_semicolon(std::string line)
 	return true;
 }
 
-bool is_valid(char *file)
+bool	root_location(char *file)
+{
+	std::fstream				config_file;
+	std::string					line;
+	int							servers;
+
+	servers = 0;
+	config_file.open(file, std::ifstream::in);
+	while (std::getline(config_file, line))
+	{
+		if (line == "server {")
+			servers++;
+		if (line == "    location / {")
+		{
+			if (servers != 1)
+				return true;
+			servers--;
+		}
+	}
+	if (servers != 0)
+		return true;
+	return false;
+}
+
+bool	is_valid(char *file)
 {
 	std::fstream				config_file;
 	std::string					line;
@@ -95,7 +119,7 @@ bool is_valid(char *file)
 		if (check_spaces(line))
 			spaces = true;
 	}
-	if(open || semicolon || spaces)
+	if(open || semicolon || spaces || root_location(file))
 		return false;
 	return (true);
 }

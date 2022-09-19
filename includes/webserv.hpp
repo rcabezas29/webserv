@@ -6,7 +6,7 @@
 /*   By: dpuente- <dpuente-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/27 18:19:45 by rcabezas          #+#    #+#             */
-/*   Updated: 2022/09/04 12:40:20 by dpuente-         ###   ########.fr       */
+/*   Updated: 2022/09/13 19:37:19 by dpuente-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <map>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <dirent.h>
 #include <poll.h>
 #include <netinet/in.h>
 
