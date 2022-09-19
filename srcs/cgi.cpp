@@ -36,7 +36,10 @@ char	**ws::cgi::fusion_env_with_vars(char **vars) const
 		ret[i++] = strdup(vars[j]);
 	ret[i] = NULL;
 
+	for (int i = 0; vars[i]; ++i)
+		delete vars[i];
 	delete[] vars;
+
 	return ret;
 }
 
@@ -118,9 +121,6 @@ std::string	ws::cgi::create_response(void)
 	std::string	abs_path = pwd + "/" + this->_program;
 	this->_file = pwd + "/" + this->_file;
 
-	for (int i = 0; env[i]; ++i)
-		std::cout << " -> " << env[i] << std::endl;
-
 	if ((pid = fork()) == -1)
 		perror("fork error");
 	else if (pid == 0)
@@ -128,7 +128,6 @@ std::string	ws::cgi::create_response(void)
 		dup2(pipe_fd[1], STDOUT_FILENO);
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
-
 
 		// 							Failing when incluiding META VARIABLES ----->
 		if (execle(abs_path.c_str(), abs_path.c_str(), this->_file.c_str(), NULL, environ) < 0)
@@ -138,6 +137,10 @@ std::string	ws::cgi::create_response(void)
 	read(pipe_fd[0], aux, sizeof(aux));
 
 	res = response_from_cgi(aux);
+
+	for (int i = 0; env[i]; ++i)
+		delete env[i];
+	delete[] env;
 
 	return res.response_to_text();
 }

@@ -18,6 +18,7 @@ namespace	ws
 			start_line							_sl;
 			std::map<std::string, std::string>	_headers;
 			std::string 						_host;
+			std::string							_body;
 
 		public:
 			request(void);
@@ -25,6 +26,10 @@ namespace	ws
 
 			start_line	get_start_line(void) const;
 			std::string	get_host(void) const;
+			std::string	get_body(void) const;
+			std::map<std::string, std::string>	get_headers(void) const;
+
+			void	set_body(std::string body);
 
 			void	parse_header(std::string header);
 			void	parse_start_line(std::string start_line);

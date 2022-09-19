@@ -26,6 +26,9 @@ namespace	ws
 			void			connecting(void);
 			void			parse_request(std::string request);
 			std::string		create_response(void) const;
+			std::string		create_response_get(void) const;
+			std::string		create_response_post(void) const;
+			std::string		create_response_delete(void) const;
 			short			open_response_file(std::fstream *body_file, location_config loc, std::string path) const;
 			void			create_body_from_default_error_page(std::fstream *file, short st_code) const;
 			void			create_autoindex_file(std::fstream *file, std::string path) const;

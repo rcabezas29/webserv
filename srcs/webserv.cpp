@@ -42,21 +42,16 @@ int	main(int argc, char **argv) {
 	add_fds_to_pollfd(pfds, cluster);
 	while (true)
 	{
-		printf("\n+++++++ RUNNING ++++++++\n\n");
-
 		if (poll(pfds, cluster.size(), INT32_MAX) == -1) {
 			perror("poll");
 			exit(1);
 		}
 		for (std::vector<ws::server>::size_type i = 0; i < cluster.size(); i++)
 		{
-			printf("\n+++++++ Waiting for new connection ++++++++\n\n");
-
 			if (poll(pfds, cluster.size(), INT32_MAX) == -1) {
 				perror("poll");
 				exit(1);
 			}
-
 			for (std::vector<ws::server>::size_type i = 0; i < cluster.size(); i++)
 			{
 				if (pfds[i].revents & POLLIN)

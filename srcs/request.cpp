@@ -22,3 +22,9 @@ void	ws::request::parse_header(std::string header) {
 ws::start_line	ws::request::get_start_line(void) const { return this->_sl; }
 
 std::string	ws::request::get_host(void) const { return this->_host; }
+
+std::string	ws::request::get_body(void) const { return this->_body; }
+
+std::map<std::string, std::string>	ws::request::get_headers(void) const { return this->_headers; }
+
+void		ws::request::set_body(std::string body) { this->_body = body; }
