@@ -8,12 +8,9 @@ ws::server::~server(void) {}
 
 void	ws::server::parse_request(std::string request)
 {
-	std::cout << "-- REQUEST --" << std::endl;
-	std::cout << request << std::endl;
-
-	std::vector<std::string>	request_lines = ws::ft_split(request, "\r\n");
-	std::vector<std::string>::iterator it = request_lines.begin();
-	std::string	body;
+	std::vector<std::string>			request_lines = ws::ft_split(request, "\r\n");
+	std::vector<std::string>::iterator	it = request_lines.begin();
+	std::string							body;
 
 	while (it != request_lines.end() && *it != "")
 	{
@@ -23,9 +20,8 @@ void	ws::server::parse_request(std::string request)
 			this->_req.parse_header(*it);
 		++it;
 	}
-	while (it++ != request_lines.end())
-		body += *it;
-
+	while (it != request_lines.end())
+		body += *it++;
 	this->_req.set_body(body);
 }
 
