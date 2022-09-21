@@ -9,6 +9,7 @@ struct location_config
 	bool											autoindex;
 	std::string										index;
 	std::string										root;
+	std::string										upload_directory;
 };
 
 struct server_config

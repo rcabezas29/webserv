@@ -6,12 +6,16 @@ ws::server::server(server_config conf) : _sock(AF_INET, SOCK_STREAM, 0, conf.lis
 
 ws::server::~server(void) {}
 
-void	ws::server::parse_request(std::string request) {
+void	ws::server::parse_request(std::string request)
+{
+	std::cout << "-- REQUEST --" << std::endl;
+	std::cout << request << std::endl;
+
 	std::vector<std::string>	request_lines = ws::ft_split(request, "\r\n");
 	std::vector<std::string>::iterator it = request_lines.begin();
 	std::string	body;
 
-	while (*it != "")
+	while (it != request_lines.end() && *it != "")
 	{
 		if (it == request_lines.begin())
 			this->_req.parse_start_line(*it);
@@ -57,7 +61,8 @@ std::string	ws::server::is_absolute_path(std::string path) const
 		}
 		this->_conf.locations.begin() = tmp;
 	}	
-	if (path_len > 1){
+	if (path_len > 1)
+	{
 		std::string 	f_path = "";
 		std::string		e_path = "";
 		bool			part = true;
@@ -147,14 +152,8 @@ std::string	ws::server::create_response_delete(void) const
 
 std::string	ws::server::create_response_post(void) const
 {
-	response	res;
-	std::ofstream file(this->_req.get_start_line().request_target.substr(1, std::string::npos), std::ios::out);
+	ws::response	res;
 
-	file << this->_req.get_body();
-
-	file.close();
-
-	res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
 	return res.response_to_text();
 }
 
@@ -209,7 +208,7 @@ std::string	ws::server::create_response_get(void) const
 	{
 		std::map<std::string, std::string>	h;
 
-		h["Content-Length"] = res.get_body().size();
+		h["Content-Length"] = std::to_string(res.get_body().size());
 		res.set_headers(h);
 	}
 
