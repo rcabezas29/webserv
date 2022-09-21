@@ -19,8 +19,11 @@ void	ws::server::parse_request(std::string request) {
 			this->_req.parse_header(*it);
 		++it;
 	}
-	while (it++ != request_lines.end())
+	while (it != request_lines.end())
+	{
 		body += *it;
+		it++;
+	}
 
 	this->_req.set_body(body);
 }
