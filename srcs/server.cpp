@@ -6,12 +6,13 @@ ws::server::server(server_config conf) : _sock(AF_INET, SOCK_STREAM, 0, conf.lis
 
 ws::server::~server(void) {}
 
-void	ws::server::parse_request(std::string request) {
-	std::vector<std::string>	request_lines = ws::ft_split(request, "\r\n");
-	std::vector<std::string>::iterator it = request_lines.begin();
-	std::string	body;
+void	ws::server::parse_request(std::string request)
+{
+	std::vector<std::string>			request_lines = ws::ft_split(request, "\r\n");
+	std::vector<std::string>::iterator	it = request_lines.begin();
+	std::string							body;
 
-	while (*it != "")
+	while (it != request_lines.end() && *it != "")
 	{
 		if (it == request_lines.begin())
 			this->_req.parse_start_line(*it);
@@ -28,7 +29,10 @@ void	ws::server::parse_request(std::string request) {
 	this->_req.set_body(body);
 }
 
-void	ws::server::connecting(void) {
+
+
+void	ws::server::connecting(void)
+{
 	int accept_fd = 0;
 	int addrlen = sizeof(this->_sock.get_address());
 	char buffer[30000] = {0};
@@ -43,6 +47,7 @@ void	ws::server::connecting(void) {
 	std::string res(this->create_response());
 	send(accept_fd, res.c_str(), res.length(), 0);
 	shutdown(accept_fd, 2);
+	this->_req.get_headers().clear();
 	return ;
 }
 
@@ -60,7 +65,8 @@ std::string	ws::server::is_absolute_path(std::string path) const
 		}
 		this->_conf.locations.begin() = tmp;
 	}	
-	if (path_len > 1){
+	if (path_len > 1)
+	{
 		std::string 	f_path = "";
 		std::string		e_path = "";
 		bool			part = true;
@@ -148,16 +154,43 @@ std::string	ws::server::create_response_delete(void) const
 	return "";
 }
 
+location_config	ws::server::find_request_location(std::string request_target) const
+{
+	if (request_target == "/")
+	{
+		for (std::vector<location_config>::const_iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
+			if (it->path == "/")
+				return *it;
+	}
+
+	size_t pos = request_target.find_last_of('/');
+
+
+	std::cout << request_target.substr(0, pos) << std::endl;
+
+	return (location_config){};
+}
+
 std::string	ws::server::create_response_post(void) const
 {
-	response	res;
-	std::ofstream file(this->_req.get_start_line().request_target.substr(1, std::string::npos), std::ios::out);
+	ws::response						res;
+	std::map<std::string, std::string>	headers = this->_req.get_headers();
+	location_config						loc = find_request_location(this->_req.get_start_line().request_target);
+	std::string							path = this->is_absolute_path(this->_req.get_start_line().request_target);
 
-	file << this->_req.get_body();
+	if (loc.accepted_methods.find("POST") == loc.accepted_methods.end())
+	{
+		res.set_status_line((status_line){"HTTP/1.1", "Forbidden", 403});
+		return res.response_to_text();
+	}
+	if (this->_conf.cgi.size() <= 0 || ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multi-part/form-data"))
+	{
+		std::cout << " BUENAS " << std::endl;
+		res.set_status_line((status_line){"HTTP/1.1", "Internal Server Error", 500});
+		return res.response_to_text();
+	}
 
-	file.close();
 
-	res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
 	return res.response_to_text();
 }
 
@@ -165,11 +198,9 @@ std::string	ws::server::create_response_get(void) const
 {
 	response		res;
 	std::fstream	body_file;
+	std::string		path = this->is_absolute_path(this->_req.get_start_line().request_target);
 	short			st_code = 404;
-	std::string		path;
 	bool			absolute = false;
-	
-	path = this->is_absolute_path(this->_req.get_start_line().request_target);
 
 	if (check_if_cgi(path))
 	{
@@ -212,7 +243,7 @@ std::string	ws::server::create_response_get(void) const
 	{
 		std::map<std::string, std::string>	h;
 
-		h["Content-Length"] = res.get_body().size();
+		h["Content-Length"] = std::to_string(res.get_body().size());
 		res.set_headers(h);
 	}
 
