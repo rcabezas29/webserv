@@ -2,10 +2,7 @@
 
 ws::request::request(void) {}
 
-ws::request::~request(void)
-{
-	this->_headers.~map();
-}
+ws::request::~request(void) {}
 
 void	ws::request::parse_start_line(std::string start_line) {
 	std::vector<std::string>	mrv = ws::ft_split(start_line, " ");

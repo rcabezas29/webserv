@@ -180,17 +180,31 @@ std::string	ws::server::create_response_post(void) const
 
 	if (loc.accepted_methods.find("POST") == loc.accepted_methods.end())
 	{
-		res.set_status_line((status_line){"HTTP/1.1", "Forbidden", 403});
+		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
 		return res.response_to_text();
 	}
-	if (this->_conf.cgi.size() <= 0 || ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multi-part/form-data"))
+	if (ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multi-part/form-data"))
 	{
-		std::cout << " BUENAS " << std::endl;
+		std::cout << "CREAMOS LOS ARCHIVITOS" << std::endl;
+		return "TODO GUCCI o no...";
+	}
+	if (this->_conf.cgi.size() <= 0)
+	{
 		res.set_status_line((status_line){"HTTP/1.1", "Internal Server Error", 500});
 		return res.response_to_text();
 	}
-
-
+	if (check_if_cgi(path))
+	{
+		for (std::map<std::string, std::string>::const_iterator it = this->_conf.cgi.begin(); it != this->_conf.cgi.end(); ++it)
+		{
+			if (path.find(it->first, path.size() - it->first.size() - 1) != std::string::npos)
+			{
+				cgi bla(*it, this->_conf, path, this->_req);
+				return bla.create_response();
+			}
+		}
+	}
+	res.set_status_line((status_line){"HTTP/1.1", "No ta implementao", 503});
 	return res.response_to_text();
 }
 

@@ -73,9 +73,9 @@ char	**ws::cgi::set_vars_into_env(void) const
 
 ws::response	ws::cgi::response_from_cgi(char *cgi_text)
 {
-	ws::response	res;
-	std::string		text(cgi_text);
-	std::vector<std::string>	splitted_text = ws::ft_split(text, "\r\n");
+	ws::response						res;
+	std::string							text(cgi_text);
+	std::vector<std::string>			splitted_text = ws::ft_split(text, "\r\n");
 	std::map<std::string, std::string>	headers;
 
 	std::vector<std::string>::iterator it = splitted_text.begin();
