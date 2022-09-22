@@ -21,7 +21,7 @@ location_config	parse_location(std::fstream *file, std::string path) {
 		else if (splitted_line[0] == "accept")
 		{
 			for (std::vector<std::string>::iterator it = splitted_line.begin() + 1; it != splitted_line.end(); ++it)
-				lc.accepted_methods.push_back(*it);
+				lc.accepted_methods.insert(*it);
 		}
 		else if (splitted_line[0] == "upload_directory")
 			lc.upload_directory = splitted_line[1];

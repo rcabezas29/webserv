@@ -5,7 +5,7 @@
 struct location_config
 {
 	std::string										path;
-	std::list<std::string>							accepted_methods;
+	std::set<std::string>							accepted_methods;
 	bool											autoindex;
 	std::string										index;
 	std::string										root;
