@@ -47,19 +47,16 @@ char	**ws::cgi::set_vars_into_env(void) const
 {
 	std::string	str;
 	char		**env = new char*[12];
-	char		tmp[FILENAME_MAX];
-
-	getcwd(tmp, FILENAME_MAX);
 
 	env[0] = strdup("CONTENT_TYPE=text");
 	env[1] = strdup("GATEWAY_INTERFACE=CGI/1.1");
-	str = "PATH_INFO=" + std::string(tmp) + "/"  + this->_file;
+	str = "PATH_INFO=" + this->_file;
 	env[2] = strdup(str.c_str());
 	str = "REMOTE_ADDR=" + this->_cmv.remote_addr;
 	env[3] = strdup(str.c_str());
 	str = "REQUEST_METHOD=" + this->_cmv.request_method;
 	env[4] = strdup(str.c_str());
-	str = "SCRIPT_FILENAME=" + std::string(tmp) + "/" + this->_cmv.script_name;
+	str = "SCRIPT_FILENAME=" + this->_file;
 	env[5] = strdup(str.c_str());
 	str = "SERVER_NAME=" + this->_cmv.server_name;
 	env[6] = strdup(str.c_str());
@@ -129,8 +126,7 @@ std::string	ws::cgi::create_response(void)
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 
-		// 							Failing when incluiding META VARIABLES ----->
-		if (execle(abs_path.c_str(), abs_path.c_str(), this->_file.c_str(), NULL, environ) < 0)
+		if (execle(abs_path.c_str(), abs_path.c_str(), this->_file.c_str(), NULL, env) < 0)
 			perror("execle");
 	}
 	close(pipe_fd[1]);

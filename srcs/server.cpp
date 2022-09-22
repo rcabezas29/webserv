@@ -25,7 +25,8 @@ void	ws::server::parse_request(std::string request)
 	this->_req.set_body(body);
 }
 
-void	ws::server::connecting(void) {
+void	ws::server::connecting(void)
+{
 	int accept_fd = 0;
 	int addrlen = sizeof(this->_sock.get_address());
 	char buffer[30000] = {0};
@@ -40,6 +41,7 @@ void	ws::server::connecting(void) {
 	std::string res(this->create_response());
 	send(accept_fd, res.c_str(), res.length(), 0);
 	shutdown(accept_fd, 2);
+	this->_req.get_headers().clear();
 	return ;
 }
 
@@ -146,9 +148,32 @@ std::string	ws::server::create_response_delete(void) const
 	return "";
 }
 
+location_config	ws::server::find_request_location(std::string request_target) const
+{
+	if (request_target == "/")
+	{
+		for (std::vector<location_config>::const_iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
+			if (it->path == "/")
+				return *it;
+	}
+
+	size_t pos = request_target.find_last_of('/');
+
+
+	std::cout << request_target.substr(0, pos) << std::endl;
+
+	return (location_config){};
+}
+
 std::string	ws::server::create_response_post(void) const
 {
-	ws::response	res;
+	ws::response						res;
+	std::map<std::string, std::string>	headers = this->_req.get_headers();
+	location_config 					loc = find_request_location(this->_req.get_start_line().request_target);
+	std::string							path = this->is_absolute_path(this->_req.get_start_line().request_target);
+
+	if (loc.accepted_methods.)
+
 
 	return res.response_to_text();
 }
@@ -157,11 +182,9 @@ std::string	ws::server::create_response_get(void) const
 {
 	response		res;
 	std::fstream	body_file;
+	std::string		path = this->is_absolute_path(this->_req.get_start_line().request_target);
 	short			st_code = 404;
-	std::string		path;
 	bool			absolute = false;
-	
-	path = this->is_absolute_path(this->_req.get_start_line().request_target);
 
 	if (check_if_cgi(path))
 	{
