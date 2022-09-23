@@ -17,7 +17,7 @@ ws::Socket::Socket(int domain, int service_type, int protocol, int port, u_long 
 		exit(1);
 	}
 	int	yes = 1;
-	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1)
 	{
 		perror("In setsockopt");
 		exit(1);

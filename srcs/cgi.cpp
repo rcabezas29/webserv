@@ -78,6 +78,7 @@ ws::response	ws::cgi::response_from_cgi(char *cgi_text)
 	std::vector<std::string>			splitted_text = ws::ft_split(text, "\r\n");
 	std::map<std::string, std::string>	headers;
 
+
 	std::vector<std::string>::iterator it = splitted_text.begin();
 	while (*it != "")
 	{
@@ -133,7 +134,7 @@ std::string	ws::cgi::create_response(void)
 	read(pipe_fd[0], aux, sizeof(aux));
 
 	res = response_from_cgi(aux);
-
+	
 	for (int i = 0; env[i]; ++i)
 		delete env[i];
 	delete[] env;

@@ -146,7 +146,7 @@ std::string		ws::server::create_response(void) const
 	else if (this->_req.get_start_line().method == "DELETE")
 		return create_response_delete();
 	else
-		return "";
+		return "HTTP/1.1 501 Not Implemented";
 }
 
 std::string	ws::server::create_response_delete(void) const
@@ -156,19 +156,29 @@ std::string	ws::server::create_response_delete(void) const
 
 location_config	ws::server::find_request_location(std::string request_target) const
 {
-	if (request_target == "/")
+	for (std::vector<location_config>::const_iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
+		if (it->path == request_target)
+			return *it;
+	size_t pos = request_target.find_last_of('/');
+	while (pos != 0)
 	{
 		for (std::vector<location_config>::const_iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
-			if (it->path == "/")
+		{
+			if (it->path == request_target.substr(0, pos))
 				return *it;
+		}
+		pos = request_target.find_last_of('/', pos - 1);
 	}
-
-	size_t pos = request_target.find_last_of('/');
-
-
-	std::cout << request_target.substr(0, pos) << std::endl;
-
 	return (location_config){};
+}
+
+std::string		ws::server::handle_multi_part(location_config loc) const
+{
+	response					res;
+	std::string					boundary = this->_req.get_headers()["Content-Type"].substr(this->_req.get_headers()["Content-Type"].find('=') + 1);
+	std::vector<std::string>	multiparts = ws::ft_split(this->_req.get_body(), "--" + boundary);
+
+	return res.response_to_text();
 }
 
 std::string	ws::server::create_response_post(void) const
@@ -183,11 +193,8 @@ std::string	ws::server::create_response_post(void) const
 		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
 		return res.response_to_text();
 	}
-	if (ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multi-part/form-data"))
-	{
-		std::cout << "CREAMOS LOS ARCHIVITOS" << std::endl;
-		return "TODO GUCCI o no...";
-	}
+	if (ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multipart/form-data"))
+		return handle_multi_part(loc);
 	if (this->_conf.cgi.size() <= 0)
 	{
 		res.set_status_line((status_line){"HTTP/1.1", "Internal Server Error", 500});
@@ -204,7 +211,7 @@ std::string	ws::server::create_response_post(void) const
 			}
 		}
 	}
-	res.set_status_line((status_line){"HTTP/1.1", "No ta implementao", 503});
+	res.set_status_line((status_line){"HTTP/1.1", "No ta implementao", 501});
 	return res.response_to_text();
 }
 

@@ -6,7 +6,7 @@ std::vector<std::string>	ws::ft_split(const std::string &s, std::string seperato
 	std::string::size_type		prev_pos = 0, pos = 0;
 
 	while (s.substr(pos, seperator.length()) == seperator)
-		++pos, ++prev_pos;
+		pos += seperator.length(), prev_pos += seperator.length();
 	while ((pos = s.find(seperator, pos)) != std::string::npos)
 	{
 		std::string	substring(s.substr(prev_pos, pos - prev_pos));
@@ -58,6 +58,8 @@ bool ws::map_value_exists(std::map<std::string, std::string> m, std::string firs
 	std::map<std::string, std::string>::iterator val = m.find(first_value);
 	if (val != m.end())
 	{
+		std::cout << "Entra... " << std::endl;
+		std::cout << val->second << " comp " << second_value << " " << second_value.size() << std::endl;
 		if (std::strncmp(val->second.c_str(), second_value.c_str(), second_value.size()) == 0)
 			return true;
 		else
