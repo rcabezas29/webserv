@@ -22,14 +22,11 @@ void	ws::server::parse_request(std::string request)
 	}
 	while (it != request_lines.end())
 	{
-		body += *it;
+		body += *it + "\n";
 		it++;
 	}
-
 	this->_req.set_body(body);
 }
-
-
 
 void	ws::server::connecting(void)
 {
@@ -126,12 +123,11 @@ std::string	ws::server::is_absolute_path(std::string path) const
 	return path;
 }
 
-bool	ws::server::check_if_cgi(std::string path) const {
-	for (std::map<std::string, std::string>::const_iterator it = this->_conf.cgi.begin(); it != this->_conf.cgi.end(); ++it)
-	{
+bool	ws::server::check_if_cgi(location_config loc, std::string path) const
+{
+	for (std::map<std::string, std::string>::const_iterator it = loc.cgi.begin(); it !=  loc.cgi.end(); ++it)
 		if (path.find(it->first, path.size() - it->first.size() - 1) != std::string::npos)
 			return true;
-	}
 	return false;
 }
 
@@ -176,7 +172,35 @@ std::string		ws::server::handle_multi_part(location_config loc) const
 {
 	response					res;
 	std::string					boundary = this->_req.get_headers()["Content-Type"].substr(this->_req.get_headers()["Content-Type"].find('=') + 1);
-	std::vector<std::string>	multiparts = ws::ft_split(this->_req.get_body(), "--" + boundary);
+	std::vector<std::string>	multiparts = ws::ft_split(this->_req.get_body(), "--" + boundary + "\n");
+
+	(void)loc;
+
+	std::cout << "-- BODY --\n" << this->_req.get_body() << std::endl; 
+
+	for (std::vector<std::string>::iterator it = multiparts.begin() + 1; it != multiparts.end(); ++it)
+	{
+		std::map<std::string, std::string>	headers;
+		std::vector<std::string>			lines = ws::ft_split(*it, "\n");
+		std::vector<std::string>::iterator	ite = lines.begin();
+		std::string							body;
+
+		while (*ite != "")
+		{
+			headers.insert(std::make_pair(ite->substr(0, ite->find(':')), ite->substr(ite->find(':') + 2, ite->size())));
+			++ite;
+		}
+		++ite;
+		while (ite != lines.end() && *ite != "--" + boundary + "--")
+		{
+			body += *ite;
+			++ite;
+		}
+
+		
+
+		headers.clear();
+	}
 
 	return res.response_to_text();
 }
@@ -193,16 +217,16 @@ std::string	ws::server::create_response_post(void) const
 		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
 		return res.response_to_text();
 	}
-	if (ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multipart/form-data"))
+	if (ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multipart/form-data") && loc.upload_directory.size() != 0)
 		return handle_multi_part(loc);
-	if (this->_conf.cgi.size() <= 0)
+	if (loc.cgi.size() <= 0)
 	{
 		res.set_status_line((status_line){"HTTP/1.1", "Internal Server Error", 500});
 		return res.response_to_text();
 	}
-	if (check_if_cgi(path))
+	if (check_if_cgi(loc, path))
 	{
-		for (std::map<std::string, std::string>::const_iterator it = this->_conf.cgi.begin(); it != this->_conf.cgi.end(); ++it)
+		for (std::map<std::string, std::string>::const_iterator it = loc.cgi.begin(); it != loc.cgi.end(); ++it)
 		{
 			if (path.find(it->first, path.size() - it->first.size() - 1) != std::string::npos)
 			{
@@ -218,14 +242,15 @@ std::string	ws::server::create_response_post(void) const
 std::string	ws::server::create_response_get(void) const
 {
 	response		res;
+	location_config	loc = find_request_location(this->_req.get_start_line().request_target);
 	std::fstream	body_file;
 	std::string		path = this->is_absolute_path(this->_req.get_start_line().request_target);
 	short			st_code = 404;
 	bool			absolute = false;
 
-	if (check_if_cgi(path))
+	if (check_if_cgi(loc, path))
 	{
-		for (std::map<std::string, std::string>::const_iterator it = this->_conf.cgi.begin(); it != this->_conf.cgi.end(); ++it)
+		for (std::map<std::string, std::string>::const_iterator it = loc.cgi.begin(); it != loc.cgi.end(); ++it)
 		{
 			if (path.find(it->first, path.size() - it->first.size() - 1) != std::string::npos)
 			{

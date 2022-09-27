@@ -4,18 +4,18 @@
 
 struct location_config
 {
-	std::string										path;
+	std::map<std::string, std::string>				cgi;
 	std::set<std::string>							accepted_methods;
-	bool											autoindex;
+	std::string										path;
 	std::string										index;
 	std::string										root;
 	std::string										upload_directory;
+	bool											autoindex;
 };
 
 struct server_config
 {
 	std::string										server_name;
-	std::map<std::string, std::string>				cgi;
 	std::pair<std::list<int>, std::string>			error_page;
 	long											client_max_body_size;
 	short											listen;

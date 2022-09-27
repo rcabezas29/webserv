@@ -58,8 +58,6 @@ bool ws::map_value_exists(std::map<std::string, std::string> m, std::string firs
 	std::map<std::string, std::string>::iterator val = m.find(first_value);
 	if (val != m.end())
 	{
-		std::cout << "Entra... " << std::endl;
-		std::cout << val->second << " comp " << second_value << " " << second_value.size() << std::endl;
 		if (std::strncmp(val->second.c_str(), second_value.c_str(), second_value.size()) == 0)
 			return true;
 		else

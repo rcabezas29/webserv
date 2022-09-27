@@ -25,6 +25,8 @@ location_config	parse_location(std::fstream *file, std::string path) {
 		}
 		else if (splitted_line[0] == "upload_directory")
 			lc.upload_directory = splitted_line[1];
+		else if (splitted_line[0] == "cgi")
+			lc.cgi.insert(std::make_pair(splitted_line[1], splitted_line[2]));
 	}
 	return lc;
 }
@@ -56,8 +58,6 @@ server_config	parse_server_config(std::fstream *file) {
 		}
 		else if (splitted_line[0] == "location")
 			config.locations.push_back(parse_location(file, splitted_line[1]));
-		else if (splitted_line[0] == "cgi")
-			config.cgi.insert(std::make_pair(splitted_line[1], splitted_line[2]));
 	}
 	return config;
 }
