@@ -147,7 +147,27 @@ std::string		ws::server::create_response(void) const
 
 std::string	ws::server::create_response_delete(void) const
 {
-	return "";
+	response		res;
+	location_config	loc = find_request_location(this->_req.get_start_line().request_target);
+
+	for (std::set<std::string>::iterator it = loc.accepted_methods.begin(); it != loc.accepted_methods.end(); ++it)
+		std::cout << "hola" << *it << std::endl;
+
+	if (loc.accepted_methods.find("DELETE") == loc.accepted_methods.end())
+	{
+		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
+		return res.response_to_text();
+	}
+	else
+	{
+		std::string	path = this->is_absolute_path(this->_req.get_start_line().request_target);
+
+		if (remove(path.c_str()) < 0)
+			res.set_status_line((status_line){"HTTP/1.1", "Forbidden", 403});
+		else
+			res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
+		return res.response_to_text();
+	}
 }
 
 location_config	ws::server::find_request_location(std::string request_target) const
@@ -165,6 +185,9 @@ location_config	ws::server::find_request_location(std::string request_target) co
 		}
 		pos = request_target.find_last_of('/', pos - 1);
 	}
+	for (std::vector<location_config>::const_iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
+		if (it->path == "/")
+			return *it;
 	return (location_config){};
 }
 
@@ -194,10 +217,6 @@ std::string		ws::server::handle_multi_part(location_config loc) const
 	response					res;
 	std::string					boundary = this->_req.get_headers()["Content-Type"].substr(this->_req.get_headers()["Content-Type"].find('=') + 1);
 	std::vector<std::string>	multiparts = ws::ft_split(this->_req.get_body(), "--" + boundary + "\n");
-
-	(void)loc;
-
-	std::cout << "-- BODY --\n" << this->_req.get_body() << std::endl; 
 
 	for (std::vector<std::string>::iterator it = multiparts.begin() + 1; it != multiparts.end(); ++it)
 	{
