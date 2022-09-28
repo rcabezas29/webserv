@@ -168,6 +168,27 @@ location_config	ws::server::find_request_location(std::string request_target) co
 	return (location_config){};
 }
 
+short	ws::server::create_multipart_files(location_config loc, std::string filename, std::string body) const
+{
+	std::ofstream	file;
+	char			dir[FILENAME_MAX];
+
+	getcwd(dir, FILENAME_MAX);
+
+	std::string	filepath(dir);
+
+	filepath += "/" + loc.upload_directory + "/" + filename;
+
+	file.open(loc.upload_directory + "/" + filename);
+	if (!file.is_open())
+		return 403;
+	else
+	{
+		file << body;
+		return 200;
+	}
+}
+
 std::string		ws::server::handle_multi_part(location_config loc) const
 {
 	response					res;
@@ -195,10 +216,22 @@ std::string		ws::server::handle_multi_part(location_config loc) const
 		{
 			body += *ite;
 			++ite;
+		}	
+
+		for (std::map<std::string, std::string>::iterator mit = headers.begin(); mit != headers.end(); ++mit)
+		{
+			if (mit->first == "Content-Disposition" && mit->second.find("filename=") != std::string::npos)
+			{
+				short	stat_code = create_multipart_files(loc, mit->second.substr(mit->second.find("filename=") + 10, mit->second.size() - (mit->second.find("filename=") + 10) - 1), body);
+				if (stat_code != 200)
+				{
+					res.set_status_line((status_line){"HTTP/1.1", "Forbidden", stat_code});
+					return res.response_to_text();
+				}
+				else
+					res.set_status_line((status_line){"HTTP/1.1", "OK", stat_code});
+			}
 		}
-
-		
-
 		headers.clear();
 	}
 

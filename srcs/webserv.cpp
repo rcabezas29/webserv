@@ -2,7 +2,8 @@
 #include "server.hpp"
 #include "server_config.hpp"
 
-void	add_servers_to_cluster(std::vector<ws::server>	*cluster, std::vector<server_config> config_servers) {
+void	add_servers_to_cluster(std::vector<ws::server>	*cluster, std::vector<server_config> config_servers)
+{
 	for (std::vector<server_config>::iterator it = config_servers.begin(); it != config_servers.end(); ++it)
 	{
 		ws::server	serv(*it);
@@ -10,7 +11,8 @@ void	add_servers_to_cluster(std::vector<ws::server>	*cluster, std::vector<server
 	}
 }
 
-void	add_fds_to_pollfd(struct pollfd *pfds, std::vector<ws::server> cluster) {
+void	add_fds_to_pollfd(struct pollfd *pfds, std::vector<ws::server> cluster)
+{
 	for (std::vector<ws::server>::size_type i = 0; i < cluster.size(); i++)
 	{
 		pfds[i].fd = cluster[i].get_socket().get_fd();
@@ -18,7 +20,8 @@ void	add_fds_to_pollfd(struct pollfd *pfds, std::vector<ws::server> cluster) {
 	}
 }
 
-int	main(int argc, char **argv) {
+int	main(int argc, char **argv)
+{
 	std::vector<server_config>	config_servers;
 	std::vector<ws::server>		cluster;
 	struct pollfd 				*pfds;
