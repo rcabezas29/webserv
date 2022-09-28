@@ -7,6 +7,7 @@
 #include "utils.hpp"
 #include "server_config.hpp"
 #include "cgi.hpp"
+#include "autoindex.hpp"
 
 namespace	ws
 {

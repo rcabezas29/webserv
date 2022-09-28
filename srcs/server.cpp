@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include "autoindex.hpp"
 
 ws::server::server(void) : _sock(AF_INET, SOCK_STREAM, 0, 4242, INADDR_ANY) {}
 
@@ -378,6 +379,7 @@ void	ws::server::create_body_from_default_error_page(std::fstream *file, short s
 
 void			ws::server::create_autoindex_file(std::fstream *file, std::string path) const {
 	(void)path;
+	create_autoindex(path);
 	file->open("html_files/temp_autoindex.html");
 }
 
