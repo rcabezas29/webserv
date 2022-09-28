@@ -3,4 +3,4 @@
 #include <filesystem>
 
 
-bool create_autoindex(std::string dir_path);
+std::string create_autoindex(std::string dir_path);

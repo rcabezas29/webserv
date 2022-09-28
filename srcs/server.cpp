@@ -378,9 +378,11 @@ void	ws::server::create_body_from_default_error_page(std::fstream *file, short s
 }
 
 void			ws::server::create_autoindex_file(std::fstream *file, std::string path) const {
-	(void)path;
-	create_autoindex(path);
-	file->open("html_files/temp_autoindex.html");
+	
+	std::string autoindex_path;
+
+	autoindex_path = create_autoindex(path);
+	file->open(autoindex_path);
 }
 
 ws::Socket	ws::server::get_socket(void) const { return this->_sock; }

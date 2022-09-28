@@ -34,12 +34,31 @@ std::map<std::string, std::string> get_dir_paths(std::string dir_path)
 	return paths;
 }
 
-bool create_autoindex(std::string dir_path){
+std::string create_file(std::map<std::string, std::string> dir_path)
+{
+	// <a href="url">link text</a>
+	std::ofstream file;
+	std::string file_path;
+
+	file_path = "tmp/autoindex.html"; //add absolute path
+    file.open(file_path);
+
+	for (std::map<std::string, std::string>::const_iterator it_m = dir_path.begin(); it_m != dir_path.end(); ++it_m)
+	{
+		file << it_m->first<< std::endl;
+	}
+	file.close();
+	//create a html autpindex canvas and insert all in the file
+	return file_path;
+
+}
+
+std::string create_autoindex(std::string dir_path){
 	
 	std::map<std::string, std::string> paths;
 	
 	paths = get_dir_paths(dir_path);
 
-	
-	return true;
+	create_file(paths);
+	return "Buenas";
 }
