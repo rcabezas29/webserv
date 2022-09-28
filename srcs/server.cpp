@@ -230,7 +230,7 @@ std::string		ws::server::handle_multi_part(location_config loc) const
 		++ite;
 		while (ite != lines.end() && *ite != "--" + boundary + "--")
 		{
-			body += *ite;
+			body += *ite + "\n";
 			++ite;
 		}	
 
