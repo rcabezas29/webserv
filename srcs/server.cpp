@@ -150,9 +150,6 @@ std::string	ws::server::create_response_delete(void) const
 	response		res;
 	location_config	loc = find_request_location(this->_req.get_start_line().request_target);
 
-	for (std::set<std::string>::iterator it = loc.accepted_methods.begin(); it != loc.accepted_methods.end(); ++it)
-		std::cout << "hola" << *it << std::endl;
-
 	if (loc.accepted_methods.find("DELETE") == loc.accepted_methods.end())
 	{
 		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
