@@ -36,7 +36,7 @@ std::map<std::string, std::string> get_dir_paths(std::string dir_path)
     std::vector<std::string>::iterator it = files.begin();
 	while (it != files.end())
 	{
-		if (*it != "." ) // si que hay que mostrarlos
+		if (*it != "." )
 			paths.insert(std::make_pair(*it, (dir_path + "/" + *it)));
 		++it;
 	}
@@ -56,16 +56,13 @@ std::string remove_first_path(std::string path){
 	return out_path;
 }
 
-std::string create_file(std::map<std::string, std::string> dir_path)
+std::string create_file(std::map<std::string, std::string> dir_path, std::string index_path)
 {
-	// <a href="url">link text</a>
-	// </body>
-	// </html>
 	std::ofstream file_out;
 	std::fstream template_auto;
 
 	std::string file_path;
-	file_path = "tmp/autoindex.html"; //add absolute path
+	file_path = "tmp/autoindex.html"; 
     
 	file_out.open(file_path, std::ios::out);
 	template_auto.open("tmp/auto_template.html", std::ifstream::in);
@@ -76,9 +73,13 @@ std::string create_file(std::map<std::string, std::string> dir_path)
 	{
 		file_out << line << std::endl;
 	}
+	file_out << "<h1>Index of " + remove_first_path(index_path) + "</h1>" << std::endl;
+	file_out << "<hr>" << std::endl;
 	for (std::map<std::string, std::string>::const_iterator it_m = dir_path.begin(); it_m != dir_path.end(); ++it_m)
 	{
-		file_out << "    <p><a href=\"/" + remove_first_path(it_m->second) + "\">" + it_m->first + path_format(it_m->first) + "</a></p>" << std::endl;
+		file_out << "    <p style=\"line-height:5px;\"><a href=\"/" \
+		+ remove_first_path(it_m->second) + "\">" + it_m->first \
+		+ path_format(it_m->first) + "</a></p>" << std::endl;
 	}
 	file_out << "</body>" << std::endl;
 	file_out << "</html>" << std::endl;
@@ -95,5 +96,5 @@ std::string create_autoindex(std::string dir_path) {
 	
 	paths = get_dir_paths(dir_path);
 
-	return create_file(paths);;
+	return create_file(paths, dir_path);;
 }
