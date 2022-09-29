@@ -7,6 +7,7 @@
 #include "utils.hpp"
 #include "server_config.hpp"
 #include "cgi.hpp"
+#include "autoindex.hpp"
 
 namespace	ws
 {
@@ -32,8 +33,11 @@ namespace	ws
 			short			open_response_file(std::fstream *body_file, location_config loc, std::string path) const;
 			void			create_body_from_default_error_page(std::fstream *file, short st_code) const;
 			void			create_autoindex_file(std::fstream *file, std::string path) const;
+			location_config	find_request_location(std::string request_target) const;
+			std::string		handle_multi_part(location_config loc) const;
+			short			create_multipart_files(location_config loc, std::string filename, std::string body) const;
 			
-			bool			check_if_cgi(std::string path) const;
+			bool			check_if_cgi(location_config loc, std::string path) const;
 
 			Socket	get_socket(void) const;
 	};

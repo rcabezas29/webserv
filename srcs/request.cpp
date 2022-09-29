@@ -12,7 +12,8 @@ void	ws::request::parse_start_line(std::string start_line) {
 	this->_sl.http_version = mrv[2];
 }
 
-void	ws::request::parse_header(std::string header) {
+void	ws::request::parse_header(std::string header)
+{
 	if (header.substr(0, header.find(' ')) == "Host:")
 		this->_host = header.substr(6, header.size());
 	if (header.find(':') != std::string::npos)

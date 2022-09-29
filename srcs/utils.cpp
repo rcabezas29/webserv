@@ -6,7 +6,7 @@ std::vector<std::string>	ws::ft_split(const std::string &s, std::string seperato
 	std::string::size_type		prev_pos = 0, pos = 0;
 
 	while (s.substr(pos, seperator.length()) == seperator)
-		++pos, ++prev_pos;
+		pos += seperator.length(), prev_pos += seperator.length();
 	while ((pos = s.find(seperator, pos)) != std::string::npos)
 	{
 		std::string	substring(s.substr(prev_pos, pos - prev_pos));
@@ -51,4 +51,17 @@ int							ws::matrix_length(char **m) {
 	while (m[i])
 		i++;
 	return i;
+}
+
+bool ws::map_value_exists(std::map<std::string, std::string> m, std::string first_value, std::string second_value) 
+{
+	std::map<std::string, std::string>::iterator val = m.find(first_value);
+	if (val != m.end())
+	{
+		if (std::strncmp(val->second.c_str(), second_value.c_str(), second_value.size()) == 0)
+			return true;
+		else
+			return false;
+	}
+	return false;
 }
