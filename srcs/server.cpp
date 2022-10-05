@@ -267,6 +267,11 @@ std::string	ws::server::create_response_post(void) const
 		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
 		return res.response_to_text();
 	}
+	if (this->_req.get_body().size() > this->_conf.client_max_body_size)
+	{
+		res.set_status_line((status_line){"HTTP/1.1", "Request Entity Too Large", 413});
+		return res.response_to_text();
+	}
 	if (ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multipart/form-data") && loc.upload_directory.size() != 0)
 		return handle_multi_part(loc);
 	if (loc.cgi.size() <= 0)
