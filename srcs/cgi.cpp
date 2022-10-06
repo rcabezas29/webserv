@@ -12,7 +12,7 @@ ws::cgi::cgi(std::pair<std::string, std::string> conf, server_config serv, std::
 	// this->_cmv.content_length = file.length();
 	this->_cmv.gateway_interface = "CGI/1.1";
 	this->_cmv.path_info = file;
-	this->_cmv.query_string = "";
+	this->_cmv.query_string = req.get_query();
 	this->_cmv.remote_addr = req.get_host();
 	this->_cmv.request_method = req.get_start_line().method;
 	this->_cmv.script_name = conf.second;
