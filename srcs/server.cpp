@@ -303,6 +303,12 @@ std::string	ws::server::create_response_get(void) const
 	short			st_code = 404;
 	bool			absolute = false;
 
+
+	if (loc.accepted_methods.find("GET") == loc.accepted_methods.end())
+	{
+		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
+		return res.response_to_text();
+	}
 	if (check_if_cgi(loc, path))
 	{
 		for (std::map<std::string, std::string>::const_iterator it = loc.cgi.begin(); it != loc.cgi.end(); ++it)
