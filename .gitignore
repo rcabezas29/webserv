@@ -39,3 +39,4 @@ trash
 .DS_Store
 .vscode
 
+tmp/autoindex.html
