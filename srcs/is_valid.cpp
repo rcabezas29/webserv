@@ -46,6 +46,8 @@ bool check_spaces(std::string line)
 		if ((n - 1) >= 0 && line[n-1] == ' ')
 			return true;
 	}
+	else
+		return true;	
 	return false;
 }
 
@@ -119,5 +121,5 @@ bool	is_valid(char *file)
 	}
 	if(open || semicolon || spaces || root_location(file))
 		return false;
-	return (true);
+	return true;
 }
