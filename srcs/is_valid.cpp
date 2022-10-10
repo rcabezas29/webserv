@@ -24,12 +24,33 @@ bool check_spaces(std::string line)
 {
 	size_t 			n;
 	int				spaces;
+	size_t			tmp;
 
 	spaces = 0;
 	n = 0;
 
 	while(n < line.size() && line[n] == ' ')
 		n++;
+	tmp = n;
+	while(tmp++ < line.size())
+	{
+		if (line[tmp] == ' ') 
+		{
+			spaces = 0;
+			while(tmp < line.size() && line[tmp] == ' ')
+			{
+				spaces++;
+				tmp++;
+			}
+			if (spaces > 1)
+			{
+				std::cout << spaces << std::endl;
+				return true;
+			}
+		}
+		if (line[tmp] == ';' && tmp > 0 && line[tmp - 1] == ' ')
+			return true;
+	}
 	if (n % 4 == 0)
 	{
 		if (line[n] == '\n')
@@ -47,7 +68,7 @@ bool check_spaces(std::string line)
 			return true;
 	}
 	else
-		return true;	
+		return true;
 	return false;
 }
 

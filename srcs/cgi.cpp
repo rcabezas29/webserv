@@ -79,11 +79,10 @@ ws::response	ws::cgi::response_from_cgi(char *cgi_text)
 	std::map<std::string, std::string>	headers;
 
 	std::vector<std::string>::iterator it = splitted_text.begin();
-	while (*it != "")
+	for (size_t n = 0; n < splitted_text.size(); n++)
 	{
-		std::vector<std::string>	split = ws::ft_split(*it, ": ");
+		std::vector<std::string>	split = ws::ft_split(*(it + n), ": ");
 		headers[split[0]] = split[1];
-		++it;
 	}
 	res.set_headers(headers);
 	std::string	body;
