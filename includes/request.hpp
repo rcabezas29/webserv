@@ -19,6 +19,7 @@ namespace	ws
 			std::map<std::string, std::string>	_headers;
 			std::string 						_host;
 			std::string							_body;
+			std::string							_query;
 
 		public:
 			request(void);
@@ -28,6 +29,7 @@ namespace	ws
 			std::string	get_host(void) const;
 			std::string	get_body(void) const;
 			std::map<std::string, std::string>	get_headers(void) const;
+			std::string	get_query(void) const;
 
 			void	set_body(std::string body);
 

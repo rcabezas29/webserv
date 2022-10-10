@@ -17,7 +17,7 @@ struct server_config
 {
 	std::string										server_name;
 	std::pair<std::list<int>, std::string>			error_page;
-	long											client_max_body_size;
+	unsigned long									client_max_body_size;
 	short											listen;
 	std::vector<location_config>					locations;
 };

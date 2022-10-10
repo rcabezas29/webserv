@@ -36,7 +36,6 @@ namespace	ws
 			location_config	find_request_location(std::string request_target) const;
 			std::string		handle_multi_part(location_config loc) const;
 			short			create_multipart_files(location_config loc, std::string filename, std::string body) const;
-			
 			bool			check_if_cgi(location_config loc, std::string path) const;
 
 			Socket	get_socket(void) const;

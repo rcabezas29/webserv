@@ -12,7 +12,7 @@ ws::cgi::cgi(std::pair<std::string, std::string> conf, server_config serv, std::
 	// this->_cmv.content_length = file.length();
 	this->_cmv.gateway_interface = "CGI/1.1";
 	this->_cmv.path_info = file;
-	this->_cmv.query_string = "";
+	this->_cmv.query_string = req.get_query();
 	this->_cmv.remote_addr = req.get_host();
 	this->_cmv.request_method = req.get_start_line().method;
 	this->_cmv.script_name = conf.second;
@@ -77,7 +77,6 @@ ws::response	ws::cgi::response_from_cgi(char *cgi_text)
 	std::string							text(cgi_text);
 	std::vector<std::string>			splitted_text = ws::ft_split(text, "\r\n");
 	std::map<std::string, std::string>	headers;
-
 
 	std::vector<std::string>::iterator it = splitted_text.begin();
 	while (*it != "")

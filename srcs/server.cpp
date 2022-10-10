@@ -127,8 +127,10 @@ std::string	ws::server::is_absolute_path(std::string path) const
 bool	ws::server::check_if_cgi(location_config loc, std::string path) const
 {
 	for (std::map<std::string, std::string>::const_iterator it = loc.cgi.begin(); it !=  loc.cgi.end(); ++it)
+	{
 		if (path.find(it->first, path.size() - it->first.size() - 1) != std::string::npos)
 			return true;
+	}
 	return false;
 }
 
@@ -206,13 +208,14 @@ short	ws::server::create_multipart_files(location_config loc, std::string filena
 	else
 	{
 		file << body;
-		return 200;
+		return 201;
 	}
 }
 
 std::string		ws::server::handle_multi_part(location_config loc) const
 {
 	response					res;
+	res.set_status_line((status_line){"HTTP/1.1", "Internal Server Error", 500});
 	std::string					boundary = this->_req.get_headers()["Content-Type"].substr(this->_req.get_headers()["Content-Type"].find('=') + 1);
 	std::vector<std::string>	multiparts = ws::ft_split(this->_req.get_body(), "--" + boundary + "\n");
 
@@ -240,13 +243,13 @@ std::string		ws::server::handle_multi_part(location_config loc) const
 			if (mit->first == "Content-Disposition" && mit->second.find("filename=") != std::string::npos)
 			{
 				short	stat_code = create_multipart_files(loc, mit->second.substr(mit->second.find("filename=") + 10, mit->second.size() - (mit->second.find("filename=") + 10) - 1), body);
-				if (stat_code != 200)
+				if (stat_code != 201)
 				{
 					res.set_status_line((status_line){"HTTP/1.1", "Forbidden", stat_code});
 					return res.response_to_text();
 				}
 				else
-					res.set_status_line((status_line){"HTTP/1.1", "OK", stat_code});
+					res.set_status_line((status_line){"HTTP/1.1", "Created", stat_code});
 			}
 		}
 		headers.clear();
@@ -262,13 +265,22 @@ std::string	ws::server::create_response_post(void) const
 	location_config						loc = find_request_location(this->_req.get_start_line().request_target);
 	std::string							path = this->is_absolute_path(this->_req.get_start_line().request_target);
 
+
 	if (loc.accepted_methods.find("POST") == loc.accepted_methods.end())
 	{
 		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
 		return res.response_to_text();
 	}
+	if (this->_req.get_body().size() > this->_conf.client_max_body_size)
+	{
+		res.set_status_line((status_line){"HTTP/1.1", "Request Entity Too Large", 413});
+		return res.response_to_text();
+	}
 	if (ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multipart/form-data") && loc.upload_directory.size() != 0)
-		return handle_multi_part(loc);
+	{
+		std::string holi = handle_multi_part(loc);
+		return holi;
+	}
 	if (loc.cgi.size() <= 0)
 	{
 		res.set_status_line((status_line){"HTTP/1.1", "Internal Server Error", 500});
@@ -285,7 +297,12 @@ std::string	ws::server::create_response_post(void) const
 			}
 		}
 	}
-	res.set_status_line((status_line){"HTTP/1.1", "No ta implementao", 501});
+	if (this->_req.get_body().size() == 2)
+	{
+		res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
+		return res.response_to_text();
+	}
+	res.set_status_line((status_line){"HTTP/1.1", "Not Implemented", 501});
 	return res.response_to_text();
 }
 
@@ -298,6 +315,12 @@ std::string	ws::server::create_response_get(void) const
 	short			st_code = 404;
 	bool			absolute = false;
 
+
+	if (loc.accepted_methods.find("GET") == loc.accepted_methods.end())
+	{
+		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
+		return res.response_to_text();
+	}
 	if (check_if_cgi(loc, path))
 	{
 		for (std::map<std::string, std::string>::const_iterator it = loc.cgi.begin(); it != loc.cgi.end(); ++it)
@@ -372,9 +395,9 @@ void	ws::server::create_body_from_default_error_page(std::fstream *file, short s
 			file->open(this->_conf.error_page.second.c_str());
 	}
 	if (st_code == 403)
-		file->open("html_files/403_forbidden.html");
+		file->open("www/403_forbidden.html");
 	else if (st_code == 404)
-		file->open("html_files/page_not_found.html");
+		file->open("www/page_not_found.html");
 }
 
 void			ws::server::create_autoindex_file(std::fstream *file, std::string path) const {

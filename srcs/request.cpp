@@ -8,7 +8,15 @@ void	ws::request::parse_start_line(std::string start_line) {
 	std::vector<std::string>	mrv = ws::ft_split(start_line, " ");
 
 	this->_sl.method = mrv[0];
-	this->_sl.request_target = mrv[1];
+	if (mrv[1].find('?') != std::string::npos)
+	{
+		std::vector<std::string>	split = ws::ft_split(mrv[1], "?");
+
+		this->_sl.request_target = split[0];
+		this->_query = split[1];
+	}
+	else
+		this->_sl.request_target = mrv[1];
 	this->_sl.http_version = mrv[2];
 }
 
@@ -29,3 +37,5 @@ std::string	ws::request::get_body(void) const { return this->_body; }
 std::map<std::string, std::string>	ws::request::get_headers(void) const { return this->_headers; }
 
 void		ws::request::set_body(std::string body) { this->_body = body; }
+
+std::string	ws::request::get_query(void) const { return this->_query; }
