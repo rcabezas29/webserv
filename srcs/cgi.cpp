@@ -74,17 +74,21 @@ ws::response	ws::cgi::response_from_cgi(char *cgi_text)
 	std::map<std::string, std::string>	headers;
 
 	std::vector<std::string>::iterator it = splitted_text.begin();
-	for (size_t n = 0; n < splitted_text.size(); n++)
+	size_t	n = 0;
+	while (n < splitted_text.size())
 	{
+		if (*(it + n) == "")
+			break ;
 		std::vector<std::string>	split = ws::ft_split(*(it + n), ": ");
 		headers[split[0]] = split[1];
+		++n;
 	}
 	res.set_headers(headers);
 	std::string	body;
-	while (it != splitted_text.end())
+	while (it + n != splitted_text.end())
 	{
-		body += *it;
-		++it;
+		body += *(it + n);
+		++n;
 	}
 	res.set_body(body);
 	res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
