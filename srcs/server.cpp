@@ -1,5 +1,4 @@
 #include "server.hpp"
-#include "autoindex.hpp"
 
 ws::server::server(void) : _sock(AF_INET, SOCK_STREAM, 0, 4242, INADDR_ANY) {}
 
@@ -64,7 +63,7 @@ void	ws::server::connecting(void)
 	this->parse_request(buffer);
 	std::string res(this->create_response());
 	send(accept_fd, res.c_str(), res.length(), 0);
-	shutdown(accept_fd, 2);
+	close(accept_fd);
 	this->_req.get_headers().clear();
 	return ;
 }

@@ -2,7 +2,6 @@
 #include "server_config.hpp"
 #include "utils.hpp"
 
-
 bool check_paths(std::string path)
 {
 	size_t n;

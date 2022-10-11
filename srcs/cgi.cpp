@@ -1,9 +1,4 @@
 #include "cgi.hpp"
-#include "stdlib.h"
-#include "limits.h"
-#include <sstream>
-#include <cstdlib>
-#include <fcntl.h>
 
 extern char **environ;
 
