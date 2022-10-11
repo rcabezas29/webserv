@@ -7,6 +7,26 @@ ws::server::server(server_config conf) : _sock(AF_INET, SOCK_STREAM, 0, conf.lis
 
 ws::server::~server(void) {}
 
+std::string	ws::server::create_error_responses(short error_code) const
+{
+	ws::response	res;
+	std::fstream	file;
+	bool			found = false;
+
+	for (std::list<int>::const_iterator it = this->_conf.error_page.first.begin(); it != this->_conf.error_page.first.end(); ++it)
+		if (*it == error_code)
+			found = true;
+
+	if (found)
+		file.open(this->_conf.error_page.second);
+	else
+		file.open("default_error_pages/" + std::to_string(error_code) + ".html");
+
+	res.set_status_line((ws::status_line){"HTTP/1.1", ws::generate_reason_phrase(error_code), error_code});
+	res.set_body(file_to_text(file));
+	return res.response_to_text();
+}
+
 void	ws::server::parse_request(std::string request)
 {
 	std::vector<std::string>			request_lines = ws::ft_split(request, "\r\n");
@@ -154,19 +174,18 @@ std::string	ws::server::create_response_delete(void) const
 	location_config	loc = find_request_location(this->_req.get_start_line().request_target);
 
 	if (loc.accepted_methods.find("DELETE") == loc.accepted_methods.end())
-	{
-		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
-		return res.response_to_text();
-	}
+		return create_error_responses(405);
 	else
 	{
 		std::string	path = this->is_absolute_path(this->_req.get_start_line().request_target);
 
 		if (remove(path.c_str()) < 0)
-			res.set_status_line((status_line){"HTTP/1.1", "Forbidden", 403});
+			return create_error_responses(403);
 		else
+		{
 			res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
-		return res.response_to_text();
+			return res.response_to_text();
+		}
 	}
 }
 
@@ -244,10 +263,7 @@ std::string		ws::server::handle_multi_part(location_config loc) const
 			{
 				short	stat_code = create_multipart_files(loc, mit->second.substr(mit->second.find("filename=") + 10, mit->second.size() - (mit->second.find("filename=") + 10) - 1), body);
 				if (stat_code != 201)
-				{
-					res.set_status_line((status_line){"HTTP/1.1", "Forbidden", stat_code});
-					return res.response_to_text();
-				}
+					return create_error_responses(stat_code);
 				else
 					res.set_status_line((status_line){"HTTP/1.1", "Created", stat_code});
 			}
@@ -267,25 +283,16 @@ std::string	ws::server::create_response_post(void) const
 
 
 	if (loc.accepted_methods.find("POST") == loc.accepted_methods.end())
-	{
-		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
-		return res.response_to_text();
-	}
+		return create_error_responses(405);
 	if (this->_req.get_body().size() > this->_conf.client_max_body_size)
-	{
-		res.set_status_line((status_line){"HTTP/1.1", "Request Entity Too Large", 413});
-		return res.response_to_text();
-	}
+		return create_error_responses(413);
 	if (ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multipart/form-data") && loc.upload_directory.size() != 0)
 	{
 		std::string holi = handle_multi_part(loc);
 		return holi;
 	}
 	if (loc.cgi.size() <= 0)
-	{
-		res.set_status_line((status_line){"HTTP/1.1", "Internal Server Error", 500});
-		return res.response_to_text();
-	}
+		return create_error_responses(500);
 	if (check_if_cgi(loc, path))
 	{
 		for (std::map<std::string, std::string>::const_iterator it = loc.cgi.begin(); it != loc.cgi.end(); ++it)
@@ -302,8 +309,7 @@ std::string	ws::server::create_response_post(void) const
 		res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
 		return res.response_to_text();
 	}
-	res.set_status_line((status_line){"HTTP/1.1", "Not Implemented", 501});
-	return res.response_to_text();
+	return create_error_responses(501);
 }
 
 std::string	ws::server::create_response_get(void) const
@@ -317,10 +323,7 @@ std::string	ws::server::create_response_get(void) const
 
 
 	if (loc.accepted_methods.find("GET") == loc.accepted_methods.end())
-	{
-		res.set_status_line((status_line){"HTTP/1.1", "Method Not Allowed", 405});
-		return res.response_to_text();
-	}
+		return create_error_responses(405);
 	if (check_if_cgi(loc, path))
 	{
 		for (std::map<std::string, std::string>::const_iterator it = loc.cgi.begin(); it != loc.cgi.end(); ++it)
@@ -352,20 +355,17 @@ std::string	ws::server::create_response_get(void) const
 			}
 		}
 	}
-	if (is_error_code(st_code))
-		create_body_from_default_error_page(&body_file, st_code);
+	if (st_code != 200)
+		return create_error_responses(st_code);
 
-	res.set_status_line((status_line){this->_req.get_start_line().http_version, generate_reason_phrase(st_code), st_code});
-
+	res.set_status_line((status_line){this->_req.get_start_line().http_version, "OK", 200});
 	res.set_body(file_to_text(body_file));
-
 	{
 		std::map<std::string, std::string>	h;
 
 		h["Content-Length"] = std::to_string(res.get_body().size());
 		res.set_headers(h);
 	}
-
 	return res.response_to_text();
 }
 
@@ -386,18 +386,6 @@ short		ws::server::open_response_file(std::fstream *body_file, location_config l
 		return 200;
 	else
 		return 404;
-}
-
-void	ws::server::create_body_from_default_error_page(std::fstream *file, short st_code) const {
-	for (std::list<int>::const_iterator it = this->_conf.error_page.first.begin(); it != this->_conf.error_page.first.end(); ++it)
-	{
-		if (*it == st_code)
-			file->open(this->_conf.error_page.second.c_str());
-	}
-	if (st_code == 403)
-		file->open("www/403_forbidden.html");
-	else if (st_code == 404)
-		file->open("www/page_not_found.html");
 }
 
 void			ws::server::create_autoindex_file(std::fstream *file, std::string path) const {

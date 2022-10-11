@@ -24,15 +24,25 @@ bool						ws::is_error_code(short code) {
 		return false;
 }
 
-std::string					ws::generate_reason_phrase(short code) {
-	if (code == 200)
-		return "OK";
-	else if (code == 400)
+std::string					ws::generate_reason_phrase(short code)
+{
+	if (code == 400)
 		return "Bad Request";
 	else if (code == 403)
 		return "Forbidden";
-	else // 404
+	else if (code == 404)
 		return "Not Found";
+	else if (code == 405)
+		return "Method Not Allowed";
+	else if (code == 413)
+		return "Payload Too Large";
+	else if (code == 429)
+		return "Method Not Allowed";
+	else if (code == 501)
+		return "Not Implemented";
+	else // 500
+		return "Internal Server Error";
+
 }
 
 std::string					ws::file_to_text(std::fstream &file) {
