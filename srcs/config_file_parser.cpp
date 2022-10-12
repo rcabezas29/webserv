@@ -2,7 +2,8 @@
 #include "server_config.hpp"
 #include "utils.hpp"
 
-location_config	parse_location(std::fstream *file, std::string path) {
+location_config	parse_location(std::fstream *file, std::string path)
+{
 	location_config	lc;
 	std::string		line;
 
@@ -31,7 +32,8 @@ location_config	parse_location(std::fstream *file, std::string path) {
 	return lc;
 }
 
-server_config	parse_server_config(std::fstream *file) {
+server_config	parse_server_config(std::fstream *file)
+{
 	std::string		line;
 	server_config	config;
 
@@ -62,7 +64,8 @@ server_config	parse_server_config(std::fstream *file) {
 	return config;
 }
 
-std::vector<server_config>	parse_config_file(char *file) {
+std::vector<server_config>	parse_config_file(char *file)
+{
 	std::fstream				config_file;
 	std::string					line;
 	std::vector<server_config>	servers;

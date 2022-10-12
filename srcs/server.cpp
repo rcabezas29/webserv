@@ -48,6 +48,13 @@ void	ws::server::parse_request(std::string request)
 	this->_req.set_body(body);
 }
 
+bool	ws::server::check_bad_request(void) const
+{
+	if (this->_req.get_start_line().http_version != "HTTP/1.1")
+		return true;
+	return false;
+}
+
 void	ws::server::connecting(void)
 {
 	int accept_fd = 0;
@@ -61,8 +68,14 @@ void	ws::server::connecting(void)
 	}
 	recv(accept_fd, buffer, 30000, 0);
 	this->parse_request(buffer);
-	std::string res(this->create_response());
-	send(accept_fd, res.c_str(), res.length(), 0);
+	if (check_bad_request())
+		send(accept_fd, create_error_responses(400).c_str(), create_error_responses(400).length(), 0);
+	else
+	{
+		std::string res(this->create_response());
+		send(accept_fd, res.c_str(), res.length(), 0);
+
+	}
 	close(accept_fd);
 	this->_req.get_headers().clear();
 	return ;
@@ -153,7 +166,7 @@ bool	ws::server::check_if_cgi(location_config loc, std::string path) const
 	return false;
 }
 
-std::string		ws::server::create_response(void) const
+std::string		ws::server::create_response(void)
 {
 	std::string	res;
 
@@ -273,7 +286,25 @@ std::string		ws::server::handle_multi_part(location_config loc) const
 	return res.response_to_text();
 }
 
-std::string	ws::server::create_response_post(void) const
+void		ws::server::handle_chunked_encoding(void)
+{
+	// Handle partitioned requests
+	std::vector<std::string>			lines = ws::ft_split(this->_req.get_body(), "\n");
+	std::vector<std::string>::iterator	it = lines.begin();
+	std::string							body;
+	
+	while (it != lines.end() && *it != "0")
+	{
+		// if (*it == "")
+		std::cout << *it << std::endl;
+		int	bytes = std::stoi(*it++);
+		body += it->substr(0, bytes);
+		it++;
+	}
+	this->_req.set_body(body);
+}
+
+std::string	ws::server::create_response_post(void)
 {
 	ws::response						res;
 	std::map<std::string, std::string>	headers = this->_req.get_headers();
@@ -285,11 +316,10 @@ std::string	ws::server::create_response_post(void) const
 		return create_error_responses(405);
 	if (this->_req.get_body().size() > this->_conf.client_max_body_size)
 		return create_error_responses(413);
+	if (ws::map_value_exists(this->_req.get_headers(), "Transfer-Encoding", "chunked"))
+		handle_chunked_encoding();
 	if (ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multipart/form-data") && loc.upload_directory.size() != 0)
-	{
-		std::string holi = handle_multi_part(loc);
-		return holi;
-	}
+		return handle_multi_part(loc);
 	if (loc.cgi.size() <= 0)
 		return create_error_responses(500);
 	if (check_if_cgi(loc, path))
@@ -319,7 +349,6 @@ std::string	ws::server::create_response_get(void) const
 	std::string		path = this->is_absolute_path(this->_req.get_start_line().request_target);
 	short			st_code = 404;
 	bool			absolute = false;
-
 
 	if (loc.accepted_methods.find("GET") == loc.accepted_methods.end())
 		return create_error_responses(405);
@@ -380,11 +409,13 @@ short		ws::server::open_response_file(std::fstream *body_file, location_config l
 		else
 			return 403;
 	}
+	if (access(path.c_str(), F_OK) == -1)
+		return 404;
 	body_file->open(path);
 	if (body_file->is_open())
 		return 200;
 	else
-		return 404;
+		return 403;
 }
 
 void			ws::server::create_autoindex_file(std::fstream *file, std::string path) const {
