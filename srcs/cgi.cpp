@@ -129,6 +129,7 @@ std::string	ws::cgi::create_response(void)
 	}
 	close(pipe_fd[1]);
 	read(pipe_fd[0], aux, sizeof(aux));
+	close(pipe_fd[0]);
 
 	res = response_from_cgi(aux);
 	
