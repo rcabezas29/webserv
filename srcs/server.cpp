@@ -2,7 +2,7 @@
 
 ws::server::server(void) : _sock(AF_INET, SOCK_STREAM, 0, 4242, INADDR_ANY) {}
 
-ws::server::server(server_config conf) : _sock(AF_INET, SOCK_STREAM, 0, conf.listen, INADDR_ANY), _conf(conf) {}
+ws::server::server(server_config conf) : _sock(AF_INET, SOCK_STREAM, 0, conf.listen, INADDR_ANY), _conf(conf), _active_sockets() {}
 
 ws::server::~server(void) {}
 
@@ -32,6 +32,8 @@ void	ws::server::parse_request(std::string request)
 	std::vector<std::string>::iterator	it = request_lines.begin();
 	std::string							body;
 
+	std::cout << "REQUEST\n" << request << std::endl;
+
 	while (it != request_lines.end() && *it != "")
 	{
 		if (it == request_lines.begin())
@@ -55,18 +57,14 @@ bool	ws::server::check_bad_request(void) const
 	return false;
 }
 
-void	ws::server::connecting(void)
+void	ws::server::connecting(int accept_fd)
 {
-	int accept_fd = 0;
-	int addrlen = sizeof(this->_sock.get_address());
 	char buffer[30000] = {0};
 
-	if ((accept_fd = accept(this->_sock.get_fd(), (struct sockaddr *)this->_sock.get_address(), (socklen_t *)&addrlen)) < 0)
+	if (recv(accept_fd, buffer, 30000, 0) == -1)
 	{
-		perror("In accept");
-		exit(1);
+		perror("In recv");
 	}
-	recv(accept_fd, buffer, 30000, 0);
 	this->parse_request(buffer);
 	if (check_bad_request())
 		send(accept_fd, create_error_responses(400).c_str(), create_error_responses(400).length(), 0);
@@ -106,7 +104,7 @@ std::string	ws::server::is_absolute_path(std::string path) const
 		{
 			if (path[n] == '/' && n != 0)
 				part = false;
-			if(part)
+			if (part)
 				f_path = f_path + path[n];
 			else
 				e_path = e_path + path[n];
@@ -427,3 +425,5 @@ void			ws::server::create_autoindex_file(std::fstream *file, std::string path) c
 }
 
 ws::Socket	ws::server::get_socket(void) const { return this->_sock; }
+
+std::set<int>	ws::server::get_active_sockets(void) const { return this->_active_sockets; }
