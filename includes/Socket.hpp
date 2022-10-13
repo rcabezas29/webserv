@@ -1,6 +1,7 @@
 #pragma once
 
 #include "webserv.hpp"
+#include <fcntl.h>
 
 namespace	ws
 {

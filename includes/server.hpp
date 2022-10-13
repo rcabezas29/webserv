@@ -17,6 +17,7 @@ namespace	ws
 			Socket			_sock;
 			server_config	_conf;
 			request			_req;
+			std::set<int>	_active_sockets;
 
 		public:
 			server(void);
@@ -24,7 +25,7 @@ namespace	ws
 			~server(void);
 
 			std::string		is_absolute_path(std::string path) const;
-			void			connecting(void);
+			void			connecting(int accept_fd);
 			void			parse_request(std::string request);
 			std::string		create_response(void);
 			std::string		create_response_get(void) const;
@@ -40,5 +41,6 @@ namespace	ws
 			std::string		create_error_responses(short error_code) const;
 			Socket			get_socket(void) const;
 			bool			check_bad_request(void) const;
+			std::set<int>	get_active_sockets(void) const;
 	};
 }

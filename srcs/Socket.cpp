@@ -1,6 +1,7 @@
 #include "Socket.hpp"
 
-ws::Socket::Socket(int domain, int service_type, int protocol, int port, u_long interface) {
+ws::Socket::Socket(int domain, int service_type, int protocol, int port, u_long interface)
+{
 	this->_address = new sockaddr_in();
 	this->_address->sin_family = domain;
 	this->_address->sin_port = htons(port);
@@ -11,9 +12,9 @@ ws::Socket::Socket(int domain, int service_type, int protocol, int port, u_long 
 		perror("Socket function error");
 		exit(1);
 	}
-	if (bind(this->_fd, (struct sockaddr *)this->_address, sizeof(*this->_address)) < 0)
+	if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) == -1)
 	{
-		perror("In bind");
+		perror("In setsockopt");
 		exit(1);
 	}
 	int	yes = 1;
@@ -22,7 +23,13 @@ ws::Socket::Socket(int domain, int service_type, int protocol, int port, u_long 
 		perror("In setsockopt");
 		exit(1);
 	}
-	if (listen(this->_fd, 10) < 0) {
+	if (bind(this->_fd, (struct sockaddr *)this->_address, sizeof(*this->_address)) < 0)
+	{
+		perror("In bind");
+		exit(1);
+	}
+	if (listen(this->_fd, 10) < 0)
+	{
 		perror("In listen");
 		exit(1);
 	}
