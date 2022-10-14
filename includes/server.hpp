@@ -42,5 +42,6 @@ namespace	ws
 			Socket			get_socket(void) const;
 			bool			check_bad_request(void) const;
 			std::set<int>	get_active_sockets(void) const;
+			void			insert_fd_to_active_sockets(int fd);
 	};
 }

@@ -61,7 +61,7 @@ void	ws::server::connecting(int accept_fd)
 {
 	char buffer[30000] = {0};
 
-	if (recv(accept_fd, buffer, 30000, 0) == -1)
+	if (recv(accept_fd, buffer, 30000, 0) == -1) // todo: check 0 
 	{
 		perror("In recv");
 	}
@@ -74,7 +74,6 @@ void	ws::server::connecting(int accept_fd)
 		send(accept_fd, res.c_str(), res.length(), 0);
 
 	}
-	close(accept_fd);
 	this->_req.get_headers().clear();
 	return ;
 }
@@ -422,6 +421,11 @@ void			ws::server::create_autoindex_file(std::fstream *file, std::string path) c
 
 	autoindex_path = create_autoindex(path);
 	file->open(autoindex_path);
+}
+
+void			ws::server::insert_fd_to_active_sockets(int fd)
+{
+	this->_active_sockets.insert(fd);
 }
 
 ws::Socket	ws::server::get_socket(void) const { return this->_sock; }
