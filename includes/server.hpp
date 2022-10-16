@@ -25,7 +25,7 @@ namespace	ws
 			~server(void);
 
 			std::string		is_absolute_path(std::string path) const;
-			void			connecting(int accept_fd);
+			void			connecting(int accept_fd, std::vector<struct pollfd> *pfds);
 			void			parse_request(std::string request);
 			std::string		create_response(void);
 			std::string		create_response_get(void) const;

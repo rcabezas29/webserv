@@ -32,8 +32,6 @@ void	ws::server::parse_request(std::string request)
 	std::vector<std::string>::iterator	it = request_lines.begin();
 	std::string							body;
 
-	std::cout << "REQUEST\n" << request << std::endl;
-
 	while (it != request_lines.end() && *it != "")
 	{
 		if (it == request_lines.begin())
@@ -57,7 +55,7 @@ bool	ws::server::check_bad_request(void) const
 	return false;
 }
 
-void	ws::server::connecting(int accept_fd)
+void	ws::server::connecting(int accept_fd, std::vector<struct pollfd> *pfds)
 {
 	char buffer[30000] = {0};
 
@@ -72,8 +70,9 @@ void	ws::server::connecting(int accept_fd)
 	{
 		std::string res(this->create_response());
 		send(accept_fd, res.c_str(), res.length(), 0);
-
 	}
+	ws::remove_fd_from_pollfd(pfds, accept_fd);
+	close(accept_fd);
 	this->_req.get_headers().clear();
 	return ;
 }
@@ -293,7 +292,6 @@ void		ws::server::handle_chunked_encoding(void)
 	while (it != lines.end() && *it != "0")
 	{
 		// if (*it == "")
-		std::cout << *it << std::endl;
 		int	bytes = std::stoi(*it++);
 		body += it->substr(0, bytes);
 		it++;

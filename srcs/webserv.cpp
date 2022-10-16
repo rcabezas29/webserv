@@ -11,30 +11,31 @@ void	add_servers_to_cluster(std::vector<ws::server>	*cluster, std::vector<server
 	}
 }
 
-void	add_fds_to_pollfd(struct pollfd *pfds, std::vector<ws::server> cluster)
+void	add_fds_to_pollfd(std::vector<struct pollfd> &pfds, std::vector<ws::server> cluster)
 {
 	for (std::vector<ws::server>::size_type i = 0; i < cluster.size(); i++)
 	{
-		pfds[i].fd = cluster[i].get_socket().get_fd();
-		pfds[i].events = POLLIN;
+		struct pollfd	pfd;
+		pfd.fd = cluster[i].get_socket().get_fd();
+		pfd.events = POLLIN;
+		pfds.push_back(pfd);
 	}
 }
 
-void	add_active_socket_to_pfds(struct pollfd *pfds[], int newfd, int *fd_count)
+void	add_active_socket_to_pfds(std::vector<struct pollfd> &pfds, int newfd)
 {
-	*fd_count += 1;
+	struct pollfd	pfd;
 
-	*pfds = (struct pollfd *)realloc(*pfds, sizeof(**pfds) * (*fd_count));
-
-    (*pfds)[*fd_count - 1].fd = newfd;
-    (*pfds)[*fd_count - 1].events = POLLIN;
+	pfd.fd = newfd;
+	pfd.events = POLLIN;
+	pfds.push_back(pfd);
 }
 
 int	main(int argc, char **argv)
 {
 	std::vector<server_config>	config_servers;
 	std::vector<ws::server>		cluster;
-	struct pollfd 				*pfds;
+	std::vector<struct pollfd> 	pfds;
 
 	if (argc != 2)
 		return 1;
@@ -50,20 +51,16 @@ int	main(int argc, char **argv)
 
 	add_servers_to_cluster(&cluster, config_servers);
 
-	int	pfds_size = cluster.size();
-
-	pfds = new pollfd[pfds_size];
-
 	add_fds_to_pollfd(pfds, cluster);
 
 	while (true)
 	{
-		if (poll(pfds, pfds_size, INT32_MAX) == -1)
+		if (poll(&pfds[0], pfds.size(), INT32_MAX) == -1)
 		{
 			perror("poll");
 			exit(1);
 		}
-		for (int i = 0; i < pfds_size; ++i)
+		for (size_t i = 0; i < pfds.size(); ++i)
 		{
 			if (pfds[i].revents & POLLIN)
 			{
@@ -79,7 +76,7 @@ int	main(int argc, char **argv)
 						{
 							fcntl(accept_fd, F_SETFL, O_NONBLOCK);
 
-							add_active_socket_to_pfds(&pfds, accept_fd, &pfds_size);
+							add_active_socket_to_pfds(pfds, accept_fd);
 
 							it->insert_fd_to_active_sockets(accept_fd);
 						}
@@ -90,10 +87,14 @@ int	main(int argc, char **argv)
 							continue ;
 						else
 						{
-							for (std::set<int>::iterator iter = it->get_active_sockets().begin(); iter != it->get_active_sockets().end(); ++iter)
+							std::set<int>	fds = it->get_active_sockets();
+							for (std::set<int>::iterator iter = fds.begin(); iter != fds.end(); ++iter)
 							{
 								if (*iter == pfds[i].fd)
-									it->connecting(*iter);
+								{
+									it->connecting(*iter, &pfds);
+									break ;
+								}
 							}
 						}
 					}
