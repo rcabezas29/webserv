@@ -75,3 +75,15 @@ bool ws::map_value_exists(std::map<std::string, std::string> m, std::string firs
 	}
 	return false;
 }
+
+void	ws::remove_fd_from_pollfd(std::vector<struct pollfd> *pfds, int fd)
+{
+	for (std::vector<struct pollfd>::iterator it = pfds->begin(); it != pfds->end(); ++it)
+	{
+		if (it->fd == fd)
+		{
+			pfds->erase(it);
+			return ;
+		}
+	}
+}

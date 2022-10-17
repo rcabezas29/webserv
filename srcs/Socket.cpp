@@ -14,7 +14,7 @@ ws::Socket::Socket(int domain, int service_type, int protocol, int port, u_long 
 	}
 	if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) == -1)
 	{
-		perror("In setsockopt");
+		perror("In fcntl");
 		exit(1);
 	}
 	int	yes = 1;
