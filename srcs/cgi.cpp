@@ -73,6 +73,8 @@ ws::response	ws::cgi::response_from_cgi(char *cgi_text)
 	std::vector<std::string>			splitted_text = ws::ft_split(text, "\r\n");
 	std::map<std::string, std::string>	headers;
 
+	std::cout << cgi_text << std::endl;
+
 	std::vector<std::string>::iterator it = splitted_text.begin();
 	size_t	n = 0;
 	while (n < splitted_text.size())

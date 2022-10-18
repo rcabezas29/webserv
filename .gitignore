@@ -41,3 +41,4 @@ trash
 
 tmp/autoindex.html
 config/bad_server1.conf
+cgi.c
