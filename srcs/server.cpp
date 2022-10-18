@@ -112,6 +112,10 @@ std::string	ws::server::is_absolute_path(std::string path) const
 		}
 		for (std::vector<const location_config>::iterator it = this->_conf.locations.begin(); it != this->_conf.locations.end(); ++it)
 		{
+
+			if (it->path == path)
+				return (it->root + "/" + it->index);
+
 			if (it->path == f_path)
 			{
 				if (f_path != "/") {
