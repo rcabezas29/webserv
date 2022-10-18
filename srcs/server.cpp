@@ -23,6 +23,12 @@ std::string	ws::server::create_error_responses(short error_code) const
 
 	res.set_status_line((ws::status_line){"HTTP/1.1", ws::generate_reason_phrase(error_code), error_code});
 	res.set_body(file_to_text(file));
+	{
+		std::map<std::string, std::string>	h;
+
+		h["Content-Length"] = std::to_string(res.get_body().size());
+		res.set_headers(h);
+	}
 	return res.response_to_text();
 }
 
@@ -61,7 +67,12 @@ void	ws::server::connecting(int accept_fd, std::vector<struct pollfd> *pfds)
 	int		ret_recv;
 
 	if ((ret_recv = recv(accept_fd, buffer, 30000, 0)) == -1)
+	{
 		perror("In recv");
+		ws::remove_fd_from_pollfd(pfds, accept_fd);
+		close(accept_fd);
+		return ;
+	}
 	this->parse_request(buffer);
 	if (check_bad_request())
 		send(accept_fd, create_error_responses(400).c_str(), create_error_responses(400).length(), 0);
@@ -198,6 +209,13 @@ std::string	ws::server::create_response_delete(void) const
 		else
 		{
 			res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
+			res.set_body(""); //TODO: Body
+			{
+				std::map<std::string, std::string>	h;
+
+				h["Content-Length"] = std::to_string(res.get_body().size());
+				res.set_headers(h);
+			}
 			return res.response_to_text();
 		}
 	}
@@ -337,6 +355,13 @@ std::string	ws::server::create_response_post(void)
 	if (this->_req.get_body().size() == 2)
 	{
 		res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
+		res.set_body(""); //TODO: Body
+		{
+			std::map<std::string, std::string>	h;
+
+			h["Content-Length"] = std::to_string(res.get_body().size());
+			res.set_headers(h);
+		}
 		return res.response_to_text();
 	}
 	return create_error_responses(501);
@@ -385,7 +410,10 @@ std::string	ws::server::create_response_get(void) const
 		}
 	}
 	if (st_code != 200)
+	{
+
 		return create_error_responses(st_code);
+	}
 
 	res.set_status_line((status_line){this->_req.get_start_line().http_version, "OK", 200});
 	res.set_body(file_to_text(body_file));

@@ -91,6 +91,12 @@ ws::response	ws::cgi::response_from_cgi(char *cgi_text)
 		++n;
 	}
 	res.set_body(body);
+	{
+		std::map<std::string, std::string>	h;
+
+		h["Content-Length"] = std::to_string(res.get_body().size());
+		res.set_headers(h);
+	}
 	res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
 	return res;
 }
@@ -136,6 +142,5 @@ std::string	ws::cgi::create_response(void)
 	for (int i = 0; env[i]; ++i)
 		delete env[i];
 	delete[] env;
-
 	return res.response_to_text();
 }
