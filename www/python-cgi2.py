@@ -1,3 +1,4 @@
+from asyncore import write
 import sys
 
 headers = \
@@ -34,4 +35,5 @@ if __name__ == "__main__":
 	else:
 		# file = sys.argv[1]
 		# print(f"{headers}\n{response1}{text_file(file)}{response2}")
-		 print(f"{headers}\n{response}")
+		sys.stdout.write(f"{headers}\n{response}")
+		#  print(f"{headers}\n{response}")
