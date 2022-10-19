@@ -66,6 +66,8 @@ int	main(int argc, char **argv)
 			{
 				for (std::vector<ws::server>::iterator it = cluster.begin(); it != cluster.end(); ++it)
 				{
+					if (&pfds.at(i) == &*pfds.end())
+						break ;
 					if (it->get_socket().get_fd() == pfds[i].fd)
 					{
 						int accept_fd;

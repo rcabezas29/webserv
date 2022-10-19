@@ -1,25 +1,8 @@
 import sys
 
-headers = \
-"""
-X-Powered-By: Python/3.9
-Content-type: text/html; charset=UTF-8
-"""
+headers = "X-Powered-By: Python/3.9\r\nContent-type: text/html; charset=UTF-8\r\n"
 
-response = \
-"""
-<html>
-        <head>
-                <title>Python CGI Test</title>
-        </head>
-        <body>
-                <p>
-					Hello Python CGI
-				</p> 
-        </body>
-</html>
-
-"""
+response = "<html>\n<head>\n<title>\nPython CGI Test\n</title>\n</head>\n<body>\n<p>Hello Python CGI</p>\n</body>\n</html>"
 
 def text_file(file):
 	with open(file, "r+") as r:
@@ -34,4 +17,4 @@ if __name__ == "__main__":
 	else:
 		# file = sys.argv[1]
 		# print(f"{headers}\n{response1}{text_file(file)}{response2}")
-		 print(f"{headers}\n{response}")
+		print(f"{headers}\r\n{response}\r\n")
