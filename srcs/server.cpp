@@ -68,7 +68,6 @@ void	ws::server::connecting(int accept_fd, std::vector<struct pollfd> *pfds)
 
 	if ((ret_recv = recv(accept_fd, buffer, 30000, 0)) == -1)
 	{
-		perror("In recv");
 		ws::remove_fd_from_pollfd(pfds, accept_fd);
 		close(accept_fd);
 		return ;
@@ -209,7 +208,7 @@ std::string	ws::server::create_response_delete(void) const
 		else
 		{
 			res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
-			res.set_body(""); //TODO: Body
+			res.set_body("");
 			{
 				std::map<std::string, std::string>	h;
 
@@ -308,14 +307,12 @@ std::string		ws::server::handle_multi_part(location_config loc) const
 
 void		ws::server::handle_chunked_encoding(void)
 {
-	// Handle partitioned requests
 	std::vector<std::string>			lines = ws::ft_split(this->_req.get_body(), "\n");
 	std::vector<std::string>::iterator	it = lines.begin();
 	std::string							body;
 	
 	while (it != lines.end() && *it != "0")
 	{
-		// if (*it == "")
 		int	bytes = std::stoi(*it++);
 		body += it->substr(0, bytes);
 		it++;
@@ -355,7 +352,7 @@ std::string	ws::server::create_response_post(void)
 	if (this->_req.get_body().size() == 2)
 	{
 		res.set_status_line((status_line){"HTTP/1.1", "OK", 200});
-		res.set_body(""); //TODO: Body
+		res.set_body("");
 		{
 			std::map<std::string, std::string>	h;
 
