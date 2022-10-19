@@ -56,24 +56,19 @@ int	main(int argc, char **argv)
 	while (true)
 	{
 		if (poll(&pfds[0], pfds.size(), INT32_MAX) == -1)
-		{
-			perror("poll");
 			exit(1);
-		}
 		for (size_t i = 0; i < pfds.size(); ++i)
 		{
 			if (pfds[i].revents & POLLIN)
 			{
 				for (std::vector<ws::server>::iterator it = cluster.begin(); it != cluster.end(); ++it)
 				{
-					if (&pfds.at(i) == &*pfds.end())
-						break ;
 					if (it->get_socket().get_fd() == pfds[i].fd)
 					{
 						int accept_fd;
 						int addrlen = sizeof(it->get_socket().get_address());
 						if ((accept_fd = accept(pfds[i].fd, (struct sockaddr *)(it->get_socket().get_address()), (socklen_t *)&addrlen)) == -1)
-							perror("In accept");
+							std::cerr << "Fail in accept" << std::endl;
 						else
 						{
 							fcntl(accept_fd, F_SETFL, O_NONBLOCK);

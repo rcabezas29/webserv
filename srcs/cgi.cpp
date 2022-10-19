@@ -123,15 +123,26 @@ std::string	ws::cgi::create_response(void)
 	this->_file = pwd + "/" + this->_file;
 
 	if ((pid = fork()) == -1)
-		perror("fork error");
+	{
+		std::fstream	file;
+
+		file.open("default_error_pages/500.html");
+		res.set_body(file_to_text(file));
+		res.set_status_line((status_line){"HTTP/1.1", "Internal Server Error", 500});
+		{
+			std::map<std::string, std::string>	h;
+
+			h["Content-Length"] = std::to_string(res.get_body().size());
+			res.set_headers(h);
+		}
+		return res.response_to_text();
+	}
 	else if (pid == 0)
 	{
 		dup2(pipe_fd[1], STDOUT_FILENO);
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
-
-		if (execle(abs_path.c_str(), abs_path.c_str(), this->_file.c_str(), NULL, env) < 0)
-			perror("execle");
+		execle(abs_path.c_str(), abs_path.c_str(), this->_file.c_str(), NULL, env);
 	}
 	close(pipe_fd[1]);
 	read(pipe_fd[0], aux, sizeof(aux));
