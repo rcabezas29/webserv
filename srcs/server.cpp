@@ -199,7 +199,7 @@ std::string		ws::server::create_response(void)
 	else if (this->_req.get_start_line().method == "DELETE")
 		return create_response_delete();
 	else
-		return "HTTP/1.1 501 Not Implemented";
+		return create_error_responses(501);
 }
 
 std::string	ws::server::create_response_delete(void) const
