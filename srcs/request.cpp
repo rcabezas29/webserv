@@ -4,8 +4,15 @@ ws::request::request(void) {}
 
 ws::request::~request(void) {}
 
-void	ws::request::parse_start_line(std::string start_line) {
+void	ws::request::parse_start_line(std::string start_line)
+{
 	std::vector<std::string>	mrv = ws::ft_split(start_line, " ");
+
+	if (mrv.size() != 3)
+	{
+		this->_sl.method = "";
+		return ;
+	}
 
 	this->_sl.method = mrv[0];
 	if (mrv[1].find('?') != std::string::npos)

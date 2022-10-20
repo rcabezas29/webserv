@@ -63,18 +63,28 @@ bool	ws::server::check_bad_request(void) const
 
 void	ws::server::connecting(int accept_fd, std::vector<struct pollfd> *pfds)
 {
-	char	buffer[30000] = {0};
+	char	buffer[INT16_MAX] = {0};
 	int		ret_recv;
 
-	if ((ret_recv = recv(accept_fd, buffer, 30000, 0)) == -1)
+	if ((ret_recv = recv(accept_fd, buffer, INT16_MAX, 0)) == -1)
 	{
 		ws::remove_fd_from_pollfd(pfds, accept_fd);
 		close(accept_fd);
 		return ;
 	}
+	if (ret_recv == INT16_MAX)
+	{
+		send(accept_fd, create_error_responses(413).c_str(), create_error_responses(413).length(), 0);
+		ws::remove_fd_from_pollfd(pfds, accept_fd);
+		return ;
+	}
 	this->parse_request(buffer);
 	if (check_bad_request())
+	{
 		send(accept_fd, create_error_responses(400).c_str(), create_error_responses(400).length(), 0);
+		ws::remove_fd_from_pollfd(pfds, accept_fd);
+		return ;
+	}
 	else
 	{
 		std::string res(this->create_response());
@@ -302,22 +312,13 @@ std::string		ws::server::handle_multi_part(location_config loc) const
 		headers.clear();
 	}
 
-	return res.response_to_text();
-}
-
-void		ws::server::handle_chunked_encoding(void)
-{
-	std::vector<std::string>			lines = ws::ft_split(this->_req.get_body(), "\n");
-	std::vector<std::string>::iterator	it = lines.begin();
-	std::string							body;
-	
-	while (it != lines.end() && *it != "0")
 	{
-		int	bytes = std::stoi(*it++);
-		body += it->substr(0, bytes);
-		it++;
+		std::map<std::string, std::string>	h;
+
+		h["Content-Length"] = std::to_string(res.get_body().size());
+		res.set_headers(h);
 	}
-	this->_req.set_body(body);
+	return res.response_to_text();
 }
 
 std::string	ws::server::create_response_post(void)
@@ -327,13 +328,10 @@ std::string	ws::server::create_response_post(void)
 	location_config						loc = find_request_location(this->_req.get_start_line().request_target);
 	std::string							path = this->is_absolute_path(this->_req.get_start_line().request_target);
 
-
 	if (loc.accepted_methods.find("POST") == loc.accepted_methods.end())
 		return create_error_responses(405);
 	if (this->_req.get_body().size() > this->_conf.client_max_body_size)
 		return create_error_responses(413);
-	if (ws::map_value_exists(this->_req.get_headers(), "Transfer-Encoding", "chunked"))
-		handle_chunked_encoding();
 	if (ws::map_value_exists(this->_req.get_headers(), "Content-Type", "multipart/form-data") && loc.upload_directory.size() != 0)
 		return handle_multi_part(loc);
 	if (loc.cgi.size() <= 0)

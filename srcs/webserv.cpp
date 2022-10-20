@@ -56,13 +56,24 @@ int	main(int argc, char **argv)
 	while (true)
 	{
 		if (poll(&pfds[0], pfds.size(), INT32_MAX) == -1)
+		{
+			std::cerr << "Poll error" << std::endl;
 			exit(1);
+		}
 		for (size_t i = 0; i < pfds.size(); ++i)
 		{
 			if (pfds[i].revents & POLLIN)
 			{
 				for (std::vector<ws::server>::iterator it = cluster.begin(); it != cluster.end(); ++it)
 				{
+					try
+					{
+						pfds.at(i);
+					}
+					catch(const std::exception& e)
+					{
+						break ;
+					}
 					if (it->get_socket().get_fd() == pfds[i].fd)
 					{
 						int accept_fd;
@@ -99,5 +110,6 @@ int	main(int argc, char **argv)
 			}
 		}
 	}
+	std::cerr << "Como puede ser" << std::endl;
 	return 0;
 }
