@@ -35,7 +35,10 @@ ws::Socket::Socket(int domain, int service_type, int protocol, int port, u_long 
 	}
 }
 
-ws::Socket::~Socket(void) {}
+ws::Socket::~Socket(void) 
+{
+	// close(this->_fd);
+}
 
 int	ws::Socket::get_fd(void) const { return this->_fd; }
 

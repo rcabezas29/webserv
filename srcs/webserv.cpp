@@ -48,11 +48,8 @@ int	main(int argc, char **argv)
 		std::cerr << e.what() << '\n';
 		exit(1);
 	}
-
 	add_servers_to_cluster(&cluster, config_servers);
-
 	add_fds_to_pollfd(pfds, cluster);
-
 	while (true)
 	{
 		if (poll(&pfds[0], pfds.size(), INT32_MAX) == -1)

@@ -32,6 +32,18 @@ location_config	parse_location(std::fstream *file, std::string path)
 	return lc;
 }
 
+void check_several_servers_ports(std::vector<server_config> servers)
+{
+	std::vector<short> ports;
+	for (size_t e = 0; e < servers.size(); e++)
+	{
+		if (std::find(ports.begin(), ports.end(), servers[e].listen) == ports.end())
+			ports.push_back(servers[e].listen);
+		else
+			std::cout << "ERROR: Sane port in several servers" << std::endl;
+	}
+}
+
 server_config	parse_server_config(std::fstream *file)
 {
 	std::string		line;
@@ -69,6 +81,7 @@ std::vector<server_config>	parse_config_file(char *file)
 	std::fstream				config_file;
 	std::string					line;
 	std::vector<server_config>	servers;
+	std::vector<std::string>	allports;
 
 	if (is_valid(file))
 	{
@@ -80,6 +93,7 @@ std::vector<server_config>	parse_config_file(char *file)
 				servers.push_back(parse_server_config(&config_file));
 			}
 		}
+		check_several_servers_ports(servers);
 		return servers;
 	}
 	else

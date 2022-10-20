@@ -1,3 +1,4 @@
+from asyncore import write
 import sys
 
 headers = "X-Powered-By: Python/3.9\r\nContent-type: text/html; charset=UTF-8\r\n"
