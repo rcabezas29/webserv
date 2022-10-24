@@ -6,7 +6,7 @@
 #    By: rcabezas <rcabezas@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/07 10:50:06 by rcabezas          #+#    #+#              #
-#    Updated: 2022/10/20 12:15:39 by rcabezas         ###   ########.fr        #
+#    Updated: 2022/10/24 18:27:23 by rcabezas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = webserv
 
 CXX = clang++
 
-CXXFLAGS = -Wall -Werror -Wextra -I includes -g3 -fsanitize=address
+CXXFLAGS = -Wall -Werror -Wextra -I includes #-g3 -fsanitize=address
 
 SRCS = srcs/webserv.cpp srcs/Socket.cpp srcs/server.cpp srcs/request.cpp \
 		srcs/utils.cpp srcs/response.cpp srcs/config_file_parser.cpp \

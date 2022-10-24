@@ -40,7 +40,10 @@ void check_several_servers_ports(std::vector<server_config> servers)
 		if (std::find(ports.begin(), ports.end(), servers[e].listen) == ports.end())
 			ports.push_back(servers[e].listen);
 		else
-			std::cout << "ERROR: Sane port in several servers" << std::endl;
+		{
+			std::cout << "ERROR: Same port in several servers" << std::endl;
+			exit(1);
+		}
 	}
 }
 

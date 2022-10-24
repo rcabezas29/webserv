@@ -126,7 +126,7 @@ void	ws::server::sending(int accept_fd, std::vector<struct pollfd> *pfds)
 			close(accept_fd);
 		}
 	}
-	if ((this->_req.get_headers().find("Connection") != this->_req.get_headers().end() && this->_req.get_headers()["Connection"] == "close"))
+	if (this->_req.get_headers().find("Connection") != this->_req.get_headers().end() && this->_req.get_headers()["Connection"] == "close")
 	{
 		ws::remove_fd_from_pollfd(pfds, accept_fd);
 		close(accept_fd);
