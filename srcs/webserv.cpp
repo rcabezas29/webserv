@@ -27,7 +27,7 @@ void	add_active_socket_to_pfds(std::vector<struct pollfd> &pfds, int newfd)
 	struct pollfd	pfd;
 
 	pfd.fd = newfd;
-	pfd.events = POLLIN;
+	pfd.events = POLLIN | POLLOUT;
 	pfds.push_back(pfd);
 }
 
@@ -67,7 +67,7 @@ int	main(int argc, char **argv)
 					{
 						pfds.at(i);
 					}
-					catch(const std::exception& e)
+					catch (const std::exception& e)
 					{
 						break ;
 					}
@@ -95,7 +95,7 @@ int	main(int argc, char **argv)
 							std::set<int>	fds = it->get_active_sockets();
 							for (std::set<int>::iterator iter = fds.begin(); iter != fds.end(); ++iter)
 							{
-								if (*iter == pfds[i].fd)
+								if (*iter == pfds[i].fd && it->get_res().length() == 0)
 								{
 									it->connecting(*iter, &pfds);
 									break ;
@@ -105,8 +105,22 @@ int	main(int argc, char **argv)
 					}
 				}
 			}
+			else if (pfds[i].revents & POLLOUT)
+			{
+				for (std::vector<ws::server>::iterator it = cluster.begin(); it != cluster.end(); ++it)
+				{
+					std::set<int>	fds = it->get_active_sockets();
+					for (std::set<int>::iterator iter = fds.begin(); iter != fds.end(); ++iter)
+					{
+						if (*iter == pfds[i].fd && it->get_res().length() > 0)
+						{
+							it->sending(*iter, &pfds);
+							break ;
+						}
+					}
+				}
+			}
 		}
 	}
-	std::cerr << "Como puede ser" << std::endl;
 	return 0;
 }

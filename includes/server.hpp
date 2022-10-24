@@ -18,6 +18,9 @@ namespace	ws
 			server_config	_conf;
 			request			_req;
 			std::set<int>	_active_sockets;
+			std::string		_res;
+			int				_ret_recv;
+			int				_sending_case;
 
 		public:
 			server(void);
@@ -26,6 +29,7 @@ namespace	ws
 
 			std::string		is_absolute_path(std::string path) const;
 			void			connecting(int accept_fd, std::vector<struct pollfd> *pfds);
+			void			sending(int accept_fd, std::vector<struct pollfd> *pfds);
 			void			parse_request(std::string request);
 			std::string		create_response(void);
 			std::string		create_response_get(void) const;
@@ -43,5 +47,6 @@ namespace	ws
 			bool			check_bad_request(void) const;
 			std::set<int>	get_active_sockets(void) const;
 			void			insert_fd_to_active_sockets(int fd);
+			std::string		get_res(void) const;
 	};
 }

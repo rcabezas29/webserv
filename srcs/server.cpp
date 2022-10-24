@@ -64,38 +64,57 @@ bool	ws::server::check_bad_request(void) const
 void	ws::server::connecting(int accept_fd, std::vector<struct pollfd> *pfds)
 {
 	char	buffer[INT16_MAX] = {0};
-	int		ret_recv;
 
-	if ((ret_recv = recv(accept_fd, buffer, INT16_MAX, 0)) == -1)
+	if ((this->_ret_recv = recv(accept_fd, buffer, INT16_MAX, 0)) == -1)
 	{
 		ws::remove_fd_from_pollfd(pfds, accept_fd);
 		close(accept_fd);
 		return ;
 	}
-	if (ret_recv == INT16_MAX)
+	if (this->_ret_recv == INT16_MAX)
 	{
-		send(accept_fd, create_error_responses(413).c_str(), create_error_responses(413).length(), 0);
-		ws::remove_fd_from_pollfd(pfds, accept_fd);
+		this->_sending_case = 1;
+		this->_res =  create_error_responses(413);
 		return ;
 	}
 	this->parse_request(buffer);
 	if (check_bad_request())
 	{
-		send(accept_fd, create_error_responses(400).c_str(), create_error_responses(400).length(), 0);
-		ws::remove_fd_from_pollfd(pfds, accept_fd);
+		this->_sending_case = 2;
+		this->_res = create_error_responses(400);
 		return ;
 	}
 	else
 	{
-		std::string res(this->create_response());
-		send(accept_fd, res.c_str(), res.length(), 0);
+		this->_sending_case = 3;
+		this->_res = this->create_response();
 	}
-	if (ret_recv == 0 || (this->_req.get_headers().find("Connection") != this->_req.get_headers().end() && this->_req.get_headers()["Connection"] == "Close"))
+	return ;
+}
+
+void	ws::server::sending(int accept_fd, std::vector<struct pollfd> *pfds)
+{
+	if (this->_sending_case == 1)
+	{
+		send(accept_fd, this->_res.c_str(), this->_res.length(), 0);
+		ws::remove_fd_from_pollfd(pfds, accept_fd);
+		return ;
+	}
+	else if (this->_sending_case == 2)
+	{
+		send(accept_fd, this->_res.c_str(), this->_res.length(), 0);
+		ws::remove_fd_from_pollfd(pfds, accept_fd);
+		return ;
+	}
+	else if (this->_sending_case == 3)
+		send(accept_fd, this->_res.c_str(), this->_res.length(), 0);
+	if (this->_ret_recv == 0 || (this->_req.get_headers().find("Connection") != this->_req.get_headers().end() && this->_req.get_headers()["Connection"] == "Close"))
 	{
 		ws::remove_fd_from_pollfd(pfds, accept_fd);
 		close(accept_fd);
 	}
 	this->_req.get_headers().clear();
+	this->_res = "";
 	return ;
 }
 
@@ -405,10 +424,7 @@ std::string	ws::server::create_response_get(void) const
 		}
 	}
 	if (st_code != 200)
-	{
-
 		return create_error_responses(st_code);
-	}
 
 	res.set_status_line((status_line){this->_req.get_start_line().http_version, "OK", 200});
 	res.set_body(file_to_text(body_file));
@@ -458,3 +474,5 @@ void			ws::server::insert_fd_to_active_sockets(int fd)
 ws::Socket	ws::server::get_socket(void) const { return this->_sock; }
 
 std::set<int>	ws::server::get_active_sockets(void) const { return this->_active_sockets; }
+
+std::string		ws::server::get_res(void) const { return this->_res; }
