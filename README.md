@@ -34,7 +34,7 @@ To run the server, use:
 
 ```sh
 ./webserv [configuration file]
-``
+```
 
 The server will start and listen on the ports specified in the configuration file. You can then use a web browser or a tool like curl to interact with the server.
 
